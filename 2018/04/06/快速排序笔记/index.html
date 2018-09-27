@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>快速排序笔记 | 跳蛙笔记</title>
+  <meta name="author" content="ZhouLuQi" />
+
+  
+  <meta name="description" content="这是程序猿成长的必经之路" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="快速排序笔记" />
+  <meta property="og:site_name" content="跳蛙笔记" />
+
+  
+  
+
+  
+    <meta property="og:image" content="" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="跳蛙笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">跳蛙笔记</a></h1>
+  <h2><a href="/">每次的记录都会是一次成长</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-04-06T02:57:23.000Z"><a href="/2018/04/06/快速排序笔记/">2018-04-06</a></time>
+      
+      
+  
+    <h1 class="title">快速排序笔记</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h1 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h1><p>来自 <a href="https://mp.weixin.qq.com/s?__biz=MzIwNTc4NTEwOQ==&amp;mid=2247484978&amp;idx=2&amp;sn=64ffb41c0cc224097903ca3d87730ca9&amp;chksm=972ad748a05d5e5e438481b66a99abd00f2cc312024e9d6b965ce4d9b14a72eea1c1aea73636&amp;scene=27&amp;key=b8dec7eff4635d98ccdf20bac3efddbdf57e9b06747560a7e02eff13a36ccf46ea8b17f9ee03e0d79e73694a54748b4d8ddba81a068c25d0bda192959011e5d148fd8ef3c797e4b25a3cdac8acd057c1&amp;ascene=7&amp;uin=MTQzODA4ODc3Mg%3D%3D&amp;devicetype=Windows+10&amp;version=62060038&amp;lang=zh_CN&amp;pass_ticket=AjcHLCa9A38bFTnytps1cOT4WrSymq%2BjQSIKp20SX8f7Q0bugMwtaiXbOymtfTCX&amp;winzoom=1##" target="_blank" rel="noopener">码农有道</a></p>
+<p>​       快速排序，顾名思义，是一种排序速度非常快的排序方法，该算法之所以非常快，是因为高度优化的内部循环，该算法在实际应用中非常广泛。</p>
+<p>##排序思想</p>
+<p>快速排序是一种采用分治思想，在实践中通常运行较快一种排序算法，它的思路如下:</p>
+<p>对于一个无序数组（排序前先将数组随机打乱）</p>
+<img src="/2018/04/06/快速排序笔记/1.png" title="这是一个新的博客的图片的说明">
+<p>首先，任意选取一个元素（这里选择数组第一个元素），该元素称为中轴元素</p>
+<img src="/2018/04/06/快速排序笔记/2.png" title="这是一个新的博客的图片的说明">
+<p>然后将大于或者等于中轴元素的元素放在右边，小于或者等于中轴元素的元素放在左边</p>
+<p>上面两个过程（选元素和调整位置）称为分割（partition）</p>
+<img src="/2018/04/06/快速排序笔记/3.jpg" title="这是一个新的博客的图片的说明">
+<p>然后对左右两个子数组分别按照同样的方法进行分割操作（递归进行）</p>
+<p>一直递归分割到子数组只有一个或零个元素为止，此时整个数组有序</p>
+<img src="/2018/04/06/快速排序笔记/4.jpg" title="这是一个新的博客的图片的说明">
+<p>​                                                                     子数组是相对而言的</p>
+<h4 id="分割接下来说是怎么进行的"><a href="#分割接下来说是怎么进行的" class="headerlink" title="分割接下来说是怎么进行的"></a>分割接下来说是怎么进行的</h4><p>首先，用两个变量 i 和 j 从数组两边开始向中间扫描，i 向右走，j 往左走</p>
+<img src="/2018/04/06/快速排序笔记/5.png" title="这是一个新的博客的图片的说明">
+<p><strong>i 初始化为第一个元素的下标，j 初始化为最后一个元素的下标加 1</strong></p>
+<p>i 往右走，直到遇见比中轴元素大的（或等于）元素停止移动，j 向左走，直到遇到比中轴元素小的（或等于）的元素停止移动</p>
+<img src="/2018/04/06/快速排序笔记/6.jpg" title="这是一个新的博客的图片的说明">
+<p>此时，如果 i &lt; j 则交换 i、j 所指向的元素</p>
+
+<p><strong>上图或等于是因为 i 指向的元素或 j 指向的元素可能与中轴元素相等</strong></p>
+<p>然后继续向右向左走，直到 i &gt;= j 整个扫描停止!</p>
+<img src="/2018/04/06/快速排序笔记/8.png" title="这是一个新的博客的图片的说明">
+<p>此时 i 对应元素的左边（不包含arr[i]）必定小于或等于5,j 对应元素的右边（不包含arr[j]）必定大于或等于5</p>
+<p>交换中轴元素 5 与 arr[j]</p>
+<img src="/2018/04/06/快速排序笔记/9.png" title="这是一个新的博客的图片的说明">
+<p><strong>分割完成</strong></p>
+<h4 id="排序代码"><a href="#排序代码" class="headerlink" title="排序代码"></a>排序代码</h4><p>对数组arr[low…high]进行快速排序，首先进行分割操作，返回中轴元素下标 j，然后对左数组arr[low…j-1] 和 右数组arr[j+1…high]分别递归进行排序，什么时候递归终止？当然是数组大小为小于等于1（0或1）时</p>
+<img src="/2018/04/06/快速排序笔记/10.jpg" title="这是一个新的博客的图片的说明">
+<img src="/2018/04/06/快速排序笔记/11.jpg" title="这是一个新的博客的图片的说明">
+<p>i == high 和 j == low 这两个条件防止i、j 越界</p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/算法/">算法</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/快速排序/">快速排序</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:yoursite.com">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Java/">Java</a><small>3</small></li>
+  
+    <li><a href="/categories/其他/">其他</a><small>1</small></li>
+  
+    <li><a href="/categories/算法/">算法</a><small>2</small></li>
+  
+    <li><a href="/categories/编程语言/">编程语言</a><small>1</small></li>
+  
+    <li><a href="/categories/软件使用/">软件使用</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最新文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2018/07/24/手写springIOC/">手写springIOC</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/09/设计模式之策略模式/">设计模式之策略模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/05/设计模式之建造者模式/">设计模式之建造者模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/11/学习文章地址/">学习文章地址</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/09/不用加减乘除做加法/">不用加减乘除做加法</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/Git/">Git</a><small>1</small></li>
+  
+    <li><a href="/tags/Linux下的C语言/">Linux下的C语言</a><small>1</small></li>
+  
+    <li><a href="/tags/Spring/">Spring</a><small>1</small></li>
+  
+    <li><a href="/tags/二进制加法/">二进制加法</a><small>1</small></li>
+  
+    <li><a href="/tags/快速排序/">快速排序</a><small>1</small></li>
+  
+    <li><a href="/tags/文章地址/">文章地址</a><small>1</small></li>
+  
+    <li><a href="/tags/设计模式/">设计模式</a><small>2</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Linux下的C语言/" style="font-size: 10px;">Linux下的C语言</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/二进制加法/" style="font-size: 10px;">二进制加法</a> <a href="/tags/快速排序/" style="font-size: 10px;">快速排序</a> <a href="/tags/文章地址/" style="font-size: 10px;">文章地址</a> <a href="/tags/设计模式/" style="font-size: 20px;">设计模式</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  <p>
+  
+  &copy; 2018 ZhouLuQi
+  
+  All rights reserved.</p>
+  <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</div>
+<div class="clearfix"></div>
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script></footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+<div id='bg'></div>
+</body>
+</html>

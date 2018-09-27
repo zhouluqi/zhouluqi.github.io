@@ -1,0 +1,253 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>Linux下C的按任意键执行方法 | 跳蛙笔记</title>
+  <meta name="author" content="ZhouLuQi" />
+
+  
+  <meta name="description" content="这是程序猿成长的必经之路" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="Linux下C的按任意键执行方法" />
+  <meta property="og:site_name" content="跳蛙笔记" />
+
+  
+  
+
+  
+    <meta property="og:image" content="" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="跳蛙笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">跳蛙笔记</a></h1>
+  <h2><a href="/">每次的记录都会是一次成长</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-01-08T08:47:20.000Z"><a href="/2018/01/08/Linux下C的按任意键执行方法/">2018-01-08</a></time>
+      
+      
+  
+    <h1 class="title">Linux下C的按任意键执行方法</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="在Linux下C语言的按任意键执行方法"><a href="#在Linux下C语言的按任意键执行方法" class="headerlink" title="在Linux下C语言的按任意键执行方法"></a>在Linux下C语言的按任意键执行方法</h2><p> 期末的课程设计日子又到了，这次我们课程设计是完成嵌入式系统开发-智能家居。第一节课老师没讲什么，要求我们在虚拟机Ubuntu下写一个小游戏来预热下。游戏很简单，我们重点来看按任意键执行的方法。</p>
+<img src="/2018/01/08/Linux下C的按任意键执行方法/asd.png" title="这是一个新的博客的图片的说明">
+<p>在提示信息后按任意键就可以打印随机产生的50个字母，那这个方法如何来完成呢？大家可能会说一个getchar就搞定了。我们还是来仔细的学习一下。</p>
+<h3 id="getchar-和getch"><a href="#getchar-和getch" class="headerlink" title="getchar()和getch()"></a>getchar()和getch()</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">getchar():</span><br><span class="line">该函数声明在stdio.h头文件中，使用的时候要包含stdio.h头文件。如：</span><br><span class="line">　　#include&lt;stdio.h&gt;</span><br><span class="line">　　int getchar(void);</span><br><span class="line">getch与getchar基本功能相同,差别是getch直接从键盘获取键值,不等待用户按回车,只要用户按一个键,getch就立刻返回, getch返回值是用户输入的ASCII码,出错返回-1.输入的字符不会回显在屏幕上.getch函数常用于程序调试中,在调试时,在关键位置显示有关的结果以待查看,然后用getch函数暂停程序运行,当按任意键后程序继续运行.</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">getch()：</span><br><span class="line">　　所在头文件：conio.h</span><br><span class="line">　　函数用途：从控制台读取一个字符，但不显示在屏幕上</span><br><span class="line">例如：</span><br><span class="line">　　char ch;或int ch；</span><br><span class="line">　　getch();或ch=getch();</span><br><span class="line">　　用getch();会等待你按下任意键，再继续执行下面的语句；</span><br><span class="line">　　用ch=getch();会等待你按下任意键之后，把该键字符所对应的ASCII码赋给ch,再执行下面的语句。</span><br></pre></td></tr></table></figure>
+<p>看到游戏的题目当然是用getch()符合我们的要求了，但是我们是在linux的gcc下编译er’er’er，而getch()是在conio.h头文件，但是conio.h这个文件不是c语言的标准库文件，所以在linux的gcc下是没有这个头文件的。所以我们也不能用getch()方法。那我们该如何实现呢？</p>
+<h3 id="getchar-配合stty"><a href="#getchar-配合stty" class="headerlink" title="getchar()配合stty"></a>getchar()配合stty</h3><p>我们知道getchar()输入一个字符后还需要输入一个回车才能继续执行，并且还把输入的字符打印出来，我们可以配合linux stty命令达到想要的效果。</p>
+<ul>
+<li><p>stty -icanon 设置一次性读完操作，如使用getchar()读操作，不需要按enter</p>
+</li>
+<li><p>stty -echo 设置命令不被显示</p>
+<p>通过以上俩条指令我们就可以达到想要的效果。 system(“stty -echo”);</p>
+<pre><code>system(&quot;stty -echo&quot;);
+system(&quot;stty -icanon&quot;);
+getchar();
+//继续执行的代码
+</code></pre></li>
+</ul>
+<h3 id="getch-方法"><a href="#getch-方法" class="headerlink" title="getch()方法"></a>getch()方法</h3><p>我们老师给的一个getch()方法，同样可以达到效果。</p>
+<pre><code>char getch( ) {
+    struct termios oldt, newt;
+    char ch;
+    tcgetattr( STDIN_FILENO, &amp;oldt );
+    newt = oldt;
+    newt.c_lflag &amp;= ~( ICANON | ECHO );
+    tcsetattr( STDIN_FILENO, TCSANOW, &amp;newt );
+    ch = getchar();
+    tcsetattr( STDIN_FILENO, TCSANOW, &amp;oldt );
+    return ch;
+}
+</code></pre><p>以上就是在linux 用gcc 编译C代码实现按任意键执行的俩个方法。</p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/编程语言/">编程语言</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Linux下的C语言/">Linux下的C语言</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:yoursite.com">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Java/">Java</a><small>3</small></li>
+  
+    <li><a href="/categories/其他/">其他</a><small>1</small></li>
+  
+    <li><a href="/categories/算法/">算法</a><small>2</small></li>
+  
+    <li><a href="/categories/编程语言/">编程语言</a><small>1</small></li>
+  
+    <li><a href="/categories/软件使用/">软件使用</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最新文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2018/07/24/手写springIOC/">手写springIOC</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/09/设计模式之策略模式/">设计模式之策略模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/05/设计模式之建造者模式/">设计模式之建造者模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/11/学习文章地址/">学习文章地址</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/09/不用加减乘除做加法/">不用加减乘除做加法</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/Git/">Git</a><small>1</small></li>
+  
+    <li><a href="/tags/Linux下的C语言/">Linux下的C语言</a><small>1</small></li>
+  
+    <li><a href="/tags/Spring/">Spring</a><small>1</small></li>
+  
+    <li><a href="/tags/二进制加法/">二进制加法</a><small>1</small></li>
+  
+    <li><a href="/tags/快速排序/">快速排序</a><small>1</small></li>
+  
+    <li><a href="/tags/文章地址/">文章地址</a><small>1</small></li>
+  
+    <li><a href="/tags/设计模式/">设计模式</a><small>2</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Linux下的C语言/" style="font-size: 10px;">Linux下的C语言</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/二进制加法/" style="font-size: 10px;">二进制加法</a> <a href="/tags/快速排序/" style="font-size: 10px;">快速排序</a> <a href="/tags/文章地址/" style="font-size: 10px;">文章地址</a> <a href="/tags/设计模式/" style="font-size: 20px;">设计模式</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  <p>
+  
+  &copy; 2018 ZhouLuQi
+  
+  All rights reserved.</p>
+  <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</div>
+<div class="clearfix"></div>
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script></footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+<div id='bg'></div>
+</body>
+</html>

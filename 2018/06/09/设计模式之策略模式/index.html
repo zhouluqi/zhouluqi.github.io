@@ -1,0 +1,289 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>设计模式之策略模式 | 跳蛙笔记</title>
+  <meta name="author" content="ZhouLuQi" />
+
+  
+  <meta name="description" content="这是程序猿成长的必经之路" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="设计模式之策略模式" />
+  <meta property="og:site_name" content="跳蛙笔记" />
+
+  
+  
+
+  
+    <meta property="og:image" content="" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="跳蛙笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">跳蛙笔记</a></h1>
+  <h2><a href="/">每次的记录都会是一次成长</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-06-09T09:56:13.000Z"><a href="/2018/06/09/设计模式之策略模式/">2018-06-09</a></time>
+      
+      
+  
+    <h1 class="title">设计模式之策略模式</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="设计模式之策略模式"><a href="#设计模式之策略模式" class="headerlink" title="设计模式之策略模式"></a>设计模式之策略模式</h3><p>​        之前的建造者模式是从别人的博客上摘抄的，这篇是想学习设计模式自己买了本HeadFirst设计模式,自己总结下还是对学习有帮助的。</p>
+<h3 id="先从模拟鸭子游戏开始-书中的例子"><a href="#先从模拟鸭子游戏开始-书中的例子" class="headerlink" title="先从模拟鸭子游戏开始(书中的例子)"></a>先从模拟鸭子游戏开始(书中的例子)</h3><h3 id="情景概述"><a href="#情景概述" class="headerlink" title="情景概述"></a>情景概述</h3><p>​        一个程序猿做了一个模拟鸭子的游戏，在游戏中会出现各种各样的鸭子，鸭子会一遍游泳一遍呱呱叫。代码编写的也就是设计一个鸭子的超类(父类)，各种各样的鸭子继承这个父类。</p>
+<p>###类和方法说明</p>
+<img src="/2018/06/09/设计模式之策略模式/1.png" title="这是一个新的博客的图片的说明">
+<p>​       Duck父类中的quack()方法和swim()方法是已经实现的方法，因为所有的鸭子要会呱呱叫和游泳，子类继承直接可以使用(代码复用)。display()方法是抽象的，因为每种鸭子的外观都是不一样的，让子类自己实现去展示自己的外观。因为父类中有抽象方法，所以Duck类是抽象类。</p>
+<p>​       其他的子类负责实现display()行为展示自己的外观。</p>
+<p>###提出创新</p>
+<p>​       这时候主管决定为了将其他游戏竞争者抛在脑后，添加会飞的鸭子。程序猿说没问题，这个简单，于是程序猿回去直接在父类中添加了一个方法fly()。</p>
+<img src="/2018/06/09/设计模式之策略模式/2.png" title="这是一个新的博客的图片的说明">
+<p>###产生问题</p>
+<p>​       自从加上这个方法后一些“橡皮鸭子”在屏幕上飞来飞去，原来程序猿忽略了一件事就是并非所有子类鸭子都会飞。这里涉及到<strong>对代码所做的局部修改不仅仅只影响到局部</strong>。在父类中加上的方法导致子类都具备fly功能，连那些不具备fly功能的子类也都获得此功能。</p>
+<p>###解决办法</p>
+<p>​      程序猿想到像quack()方法一样，鸭子可以直接用父类的方法嘎嘎叫，也可以重写父类中的quack()方法让鸭子吱吱叫。像这样在不应该具有fly功能的子类鸭子类中重写fly()方法，让他不实现飞的功能问题不就解决了吗？但是如果子类加入饵鸭(木头假鸭不会叫也不会飞)，岂不是都需要将两个方法覆盖掉？</p>
+<img src="/2018/06/09/设计模式之策略模式/3.png" title="这是一个新的博客的图片的说明">
+<p>###继承产生的问题</p>
+<p>利用继承来提供Duck的行为，会产生以下缺点：</p>
+<ul>
+<li>代码在多个子类中重复 <strong>不需要fly功能的子类需要重写去什么也不做</strong>。</li>
+<li>运行时的行为不容易改变 </li>
+<li>很难知道所有鸭子的全部行为</li>
+<li>改变会牵一发动全身，造成其他鸭子不想要的改变</li>
+</ul>
+<p>###接口解决</p>
+<p>​        程序猿得知主管要每六个月更新游戏，用继承是不行了，因为每当新的鸭子出现都要去检查是否需要覆盖fly()和quack()方法。所以他决定让一些类型的鸭子可以自由选择可飞可叫的功能，于是将fly()从父类提取出来放进一个Flyable的接口里，让会飞的鸭子实现此接口就OK了，quack()方法同样道理。</p>
+<img src="/2018/06/09/设计模式之策略模式/4.png" title="这是一个新的博客的图片的说明">
+<p>看似问题解决了，其实这是一个很蠢的想法，我们知道，并非所有的子类都具有飞行和呱呱叫的行为，所以继承不适合，虽然Flyable和Quackable可以解决一部分问题，但是无法达到代码复用，甚至在会飞的鸭子中飞的动作会有不同。接下来该如何解决呢？</p>
+<p>###设计原则</p>
+<p><strong>找出应用中可能需要变化之处，把他们独立出来，不要和那些不需要变化的代码混在一起</strong></p>
+<p>​      重新分析下问题，我们使用继承不能解决，因为有些行为鸭子子类在不断变化，而且让所有的子类都有这些行为是不合理的。Flyable和Quackable接口似乎还不错，解决了只有会飞的鸭子才实现Flyable，但是接口不具有实现代码，必须实现接口的鸭子类老老实实把方法实现，所以实现接口无法达到代码的复用。这就意味着：无论何时你需要修改某个行为，你必须将实现此行为的鸭子类逐个修改。</p>
+<p>   最终我们的目的是将每次新的需求会对有所改动的代码抽取出来，和其他稳定的代码分开来。并且经常更改的代码最好实现复用，只更改一次那是最好的了。</p>
+<p>###重新解决</p>
+<p>现在我们知道Duck类内的fly()和quack()会随着鸭子种类的不同而改变，所以我们将这来个行为提取出来建立新的类来代表每一个行为。</p>
+<img src="/2018/06/09/设计模式之策略模式/5.png" title="这是一个新的博客的图片的说明">
+<p>###设计鸭子的行为</p>
+<p>飞行和叫行为已经提取出来了，如何设计这俩个类呢？如何设计有弹性的程序呢？假如我们还想可以指定鸭子的行为呢？例如想产生一个绿头鸭实例并且指定特定的“类型”的飞行行为给它。让鸭子的行为可以动态的改变，换句话说，在鸭子类中包含设定行为的方法，就可以动态的改变绿头鸭的飞行行为。</p>
+<p>###设计原则</p>
+<p><strong>针对接口编程，不针对实现编程</strong></p>
+<p>现在我们利用接口代表每个行为，假如FlyBehavior与QuackBehavior,而行为的实现都可以将实现其中的一个接口。每个接口可以有很多的实现类来表达一种行为的不同类型(飞行为，怎么飞即多种飞法)。</p>
+<p>所以鸭子类不去负责实现这些行为接口，而是由鸭子的行为类去实现。这样做不同于以前，以前的做法是：行为来自父类的具体实现，或者继承某个接口自行实现，这俩种做法都依赖于“实现“,我们被邦邦的很死，不好更改行为。</p>
+<p>在新的设计中鸭子的子类将使用行为接口(FlyBehavior与QuackBehavior)所表示的行为，所以实际的“实现“不会被绑在鸭子的子类当中，具体的行为的方法实现都在那些实现了FlyBehavior与QuackBehavior接口的行为类中。</p>
+<img src="/2018/06/09/设计模式之策略模式/6.png" title="这是一个新的博客的图片的说明">
+<p>###什么是针对接口编程</p>
+<p>“针对接口编程”真正的意思是“针对超类型编程(supertype)”。所谓的接口有多个含义，接口是一个“概念”，也是Java的interface的构造。你可以在不涉及Java interface下“针对接口编程”，关键就在于多态。利用多态，程序可以针对超类型编程，执行时会根据实际情况执行到真正的行为，不会被绑死在超类型的行为上。“针对超类型编程”这句话可以明确的说成“变量的声明类型应该是超类型，通常是一个抽象类或者是一个接口，如此只要是具体实现此超类型的类所产生的对象，都可以指定给这个变量。这就意味着，声明类时不用理会以后执行时的真正对象类型!” </p>
+<h3 id="实现鸭子的行为"><a href="#实现鸭子的行为" class="headerlink" title="实现鸭子的行为"></a>实现鸭子的行为</h3><img src="/2018/06/09/设计模式之策略模式/7.png" title="这是一个新的博客的图片的说明">
+<p>这样的设计，可以让飞行和呱呱叫的动作被其他的对象复用，因为这些行为已经与鸭子类无关了，并且我们新增的一些行为不会影响到既有的行为类，也不会影响“使用”到飞行行为的鸭子类。<strong>这么一来有了继承的复用好处却没有了继承所带来的包袱</strong></p>
+<h3 id="整合鸭子的行为"><a href="#整合鸭子的行为" class="headerlink" title="整合鸭子的行为"></a>整合鸭子的行为</h3><p>首先在Duck加入两个实例变量，分别为“flyBehavior”和”quackBehavior”,都是接口类型，我们去除了Duck类中飞行和叫的行为(方法)，让这俩个变量来处理，每个鸭子对象可以动态设置变量以在运行时引用正确的行为类型。</p>
+<img src="/2018/06/09/设计模式之策略模式/8.png" title="这是一个新的博客的图片的说明">
+<p>先看鸭子父类代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class Duck&#123;</span><br><span class="line">  QuackBehavior quackBehavior; //每只鸭子都会引用实现QuackBehavior接口的对象</span><br><span class="line">  FlyBehavior flyBehavior;</span><br><span class="line">  //其他的变量</span><br><span class="line">  public void performQuack()&#123;</span><br><span class="line">    quackBehavior.quack();  //鸭子不亲自处理叫的行为，而是委托给quackBehavior引用对象。</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再来看一个子类鸭子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class MallardDuck extends Duck&#123;</span><br><span class="line">  public MallardDUck()&#123;</span><br><span class="line">    quackBehavior = new Quack();//接口回调，绿头鸭使用Quack类处理呱呱叫，所以当performQuack()被调用                                 // 时，叫的职责被委托给Quack对象，而我们得到了真正的呱呱叫。</span><br><span class="line">    flyBehavior = new FlyWithWings();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>记住因为绿头鸭继承了Duck类所以具有quackBehavior和 flyBehavior变量</strong></p>
+<p>通过上面的代码我们可以知道当MallardDuck实例化，它的构造器会把继承来的quackBehavior实例变量初始化成Quack类型的新实例，飞行方法也是同样。</p>
+<p>到了这里就差不多了，我们稍微改造就可大功告成。我们可以添加方法，让初始化实例变量做的更有弹性。就是构造函数这段代码。因为   quackBehavior的实例变量是有一个接口类型。所以我们要在运行时，通过多态的魔力动态的给它指定不同的QuickBehavior实现类。你是不是已经有想法了呢？</p>
+<h4 id="最终代码"><a href="#最终代码" class="headerlink" title="最终代码"></a>最终代码</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public class Duck&#123;</span><br><span class="line">  QuackBehavior quackBehavior; </span><br><span class="line">  FlyBehavior flyBehavior;</span><br><span class="line">   //其他的变量</span><br><span class="line">  public Duck()&#123;&#125;</span><br><span class="line">  public void performFly()&#123;</span><br><span class="line">    flyBehavior.fly();         //委托给行为类</span><br><span class="line">  &#125;</span><br><span class="line">  public void performQuack()&#123;</span><br><span class="line">    quackBehavior.quack();      //委托给行为类</span><br><span class="line">  &#125;</span><br><span class="line">  public abstract void display();</span><br><span class="line">  public void swim()&#123;</span><br><span class="line">    System.out.println(&quot;所有的鸭子都会游泳，继承父类就可得到这个功能&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  //在父类添加俩个方法，因为我们建立了一堆动态的鸭子功能没有用到，所以我们通过在鸭子子类中通过“设定方</span><br><span class="line">  //法”来设定鸭子的行为，而不是在鸭子的构造器内进行设定。从此我们可以随时调用这俩个方法来改变鸭子的行为。</span><br><span class="line">  public void setFlyBehavior(FlyBehavior fb)&#123;</span><br><span class="line">   flyBehavior = fb;         </span><br><span class="line">  &#125;</span><br><span class="line">   public void setQuackBehavior(QuackBehavior qb)&#123;</span><br><span class="line">   quackBehavior = qb;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>飞行行为接口和实现类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public interfa FlyBehavior&#123;</span><br><span class="line">public void fly();</span><br><span class="line">&#125;</span><br><span class="line">___________________________</span><br><span class="line">//飞行行为实现，给会飞的鸭子用</span><br><span class="line">public class FlyWithWings implements FlyBehavior&#123;</span><br><span class="line">  public void fly()&#123;</span><br><span class="line">    System.out.println(&quot;我可以飞了！&quot;);  </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">————————————————————————————</span><br><span class="line">//飞行行为实现，给不会飞的鸭子用(橡皮鸭和诱饵鸭用)</span><br><span class="line">public class FlyNoWay implements FlyBehavior&#123;</span><br><span class="line">  public void fly()&#123;</span><br><span class="line">    System.out.println(&quot;我不会飞&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建一个新的模型鸭子，一开始是不会飞的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class ModelDuck extends Duck&#123;</span><br><span class="line">  public ModelDuck()&#123;</span><br><span class="line">    quackBehavior = new Quack();</span><br><span class="line">    flyBehavior = new FlyNoWay();//实例一个不会飞的行为实现类对象</span><br><span class="line">  &#125;</span><br><span class="line">  public void display()&#123;</span><br><span class="line">    System.out.println(&quot;我是一个模型鸭子&quot;);//实现父类抽象方法</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建一个新的飞行行为，火箭动力飞行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public class FlyRocketPowered implements FlyBehavior&#123;</span><br><span class="line">  public void fly()&#123;</span><br><span class="line">     System.out.println(&quot;我利用火箭飞行&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Test&#123;</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line"> Duck model = new ModelDuck();</span><br><span class="line"> model.performFly();//第一次调用会被委托给 flyBehavior对象，但是实现对象是FlyNoWay()类型，构造器中设                     //设置的  (flyBehavior = new FlyNoWay();实例一个不会飞的行为实现类对象)</span><br><span class="line"> model.setFlyBehavior(new FlyRocketPowered());//调用继承来的setter方法，把火箭飞行的行为设定到模型鸭                                               //子当中,鸭子就具有了火箭飞行的行为。</span><br><span class="line"> model.performFly();//可以有火箭飞行的行为了</span><br><span class="line"> </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">我不会飞</span><br><span class="line">我利用火箭飞行</span><br></pre></td></tr></table></figure>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><img src="/2018/06/09/设计模式之策略模式/9.png" title="这是一个新的博客的图片的说明">
+<p>这个模式就是策略模式。多用组合少用继承，会有很多的方法达到继承实现复用的效果。</p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/Java/">Java</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/设计模式/">设计模式</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:yoursite.com">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Java/">Java</a><small>3</small></li>
+  
+    <li><a href="/categories/其他/">其他</a><small>1</small></li>
+  
+    <li><a href="/categories/算法/">算法</a><small>2</small></li>
+  
+    <li><a href="/categories/编程语言/">编程语言</a><small>1</small></li>
+  
+    <li><a href="/categories/软件使用/">软件使用</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最新文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2018/07/24/手写springIOC/">手写springIOC</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/09/设计模式之策略模式/">设计模式之策略模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/05/设计模式之建造者模式/">设计模式之建造者模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/11/学习文章地址/">学习文章地址</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/09/不用加减乘除做加法/">不用加减乘除做加法</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/Git/">Git</a><small>1</small></li>
+  
+    <li><a href="/tags/Linux下的C语言/">Linux下的C语言</a><small>1</small></li>
+  
+    <li><a href="/tags/Spring/">Spring</a><small>1</small></li>
+  
+    <li><a href="/tags/二进制加法/">二进制加法</a><small>1</small></li>
+  
+    <li><a href="/tags/快速排序/">快速排序</a><small>1</small></li>
+  
+    <li><a href="/tags/文章地址/">文章地址</a><small>1</small></li>
+  
+    <li><a href="/tags/设计模式/">设计模式</a><small>2</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Linux下的C语言/" style="font-size: 10px;">Linux下的C语言</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/二进制加法/" style="font-size: 10px;">二进制加法</a> <a href="/tags/快速排序/" style="font-size: 10px;">快速排序</a> <a href="/tags/文章地址/" style="font-size: 10px;">文章地址</a> <a href="/tags/设计模式/" style="font-size: 20px;">设计模式</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  <p>
+  
+  &copy; 2018 ZhouLuQi
+  
+  All rights reserved.</p>
+  <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</div>
+<div class="clearfix"></div>
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script></footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+<div id='bg'></div>
+</body>
+</html>

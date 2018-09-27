@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>设计模式之建造者模式 | 跳蛙笔记</title>
+  <meta name="author" content="ZhouLuQi" />
+
+  
+  <meta name="description" content="这是程序猿成长的必经之路" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="设计模式之建造者模式" />
+  <meta property="og:site_name" content="跳蛙笔记" />
+
+  
+  
+
+  
+    <meta property="og:image" content="" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="跳蛙笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">跳蛙笔记</a></h1>
+  <h2><a href="/">每次的记录都会是一次成长</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-06-05T09:57:59.000Z"><a href="/2018/06/05/设计模式之建造者模式/">2018-06-05</a></time>
+      
+      
+  
+    <h1 class="title">设计模式之建造者模式</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="设计模式之建造者模式"><a href="#设计模式之建造者模式" class="headerlink" title="设计模式之建造者模式"></a>设计模式之建造者模式</h2><p>java的设计模式大体上可以分为三大类:创建型模式、结构型模式、行为型模式。而建造者模式就属于创建型模式。</p>
+<p>通过阅读其他解释比较详细的博客，我理解总结为建造者模式是解决当一个类中有多个属性，new对象时初始化问题。举个例子，假如有个User类，有属性name、age、sex、tel、address，并且每个属性都可以为null,当我们实例化的时候可以初始化1个属性，需要5个构造方法，初始化2个属性需要10个构造方法。。。当然我们是不可能写这么多的构造方法的，那应该怎么办呢？哎！建造者模式出来了。下面上代码大家体会一下:</p>
+<figure class="highlight plain"><figcaption><span>class Builder &#123;    static class Student&#123;        String name </span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">public class Builder &#123;</span><br><span class="line"></span><br><span class="line">    static class User&#123;</span><br><span class="line">        String name = null ;</span><br><span class="line">        int age = 0 ;</span><br><span class="line">        String sex = null ;</span><br><span class="line">        String tel = null ;</span><br><span class="line">        String address = null ;</span><br><span class="line"></span><br><span class="line">　　　　　//构建器，利用构建器作为参数来构建Student对象</span><br><span class="line">        static class UserBuilder&#123;</span><br><span class="line">             String name = null ;</span><br><span class="line">             int age = 0 ;</span><br><span class="line">             String sex = null ;</span><br><span class="line">             String tel = null ;</span><br><span class="line">             String address = null ;</span><br><span class="line">            public UsertBuilder setName(String name) &#123;</span><br><span class="line">                this.name = name;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public StudentBuilder setAge(int age) &#123;</span><br><span class="line">                this.age = age;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public StudentBuilder setSex(String sex) &#123;</span><br><span class="line">                this.sex = sex;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public StudentBuilder setTel(String tel) &#123;</span><br><span class="line">                this.tel = tel;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public StudentBuilder setAddress(String address) &#123;</span><br><span class="line">                this.address = address;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line">            public User build() &#123;</span><br><span class="line">                return new User(this);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public User(UserBuilder builder)&#123;</span><br><span class="line">            this.age = builder.age;</span><br><span class="line">            this.name = builder.name;</span><br><span class="line">            this.sex = builder.sex;</span><br><span class="line">            this.tel = builder.tel ;</span><br><span class="line">            this.address = builder.address ;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main( String[] args )&#123;</span><br><span class="line">        User a = new User.UserBuilder().setAge(15).setName(&quot;张三&quot;).build();</span><br><span class="line">        User b = new User.UserBuilder().setAddress(&quot;吉林长春&quot;).setSex(&quot;男&quot;).setName(&quot;张杰&quot;).build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/Java/">Java</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/设计模式/">设计模式</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:yoursite.com">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Java/">Java</a><small>3</small></li>
+  
+    <li><a href="/categories/其他/">其他</a><small>1</small></li>
+  
+    <li><a href="/categories/算法/">算法</a><small>2</small></li>
+  
+    <li><a href="/categories/编程语言/">编程语言</a><small>1</small></li>
+  
+    <li><a href="/categories/软件使用/">软件使用</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最新文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2018/07/24/手写springIOC/">手写springIOC</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/09/设计模式之策略模式/">设计模式之策略模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/05/设计模式之建造者模式/">设计模式之建造者模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/11/学习文章地址/">学习文章地址</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/09/不用加减乘除做加法/">不用加减乘除做加法</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/Git/">Git</a><small>1</small></li>
+  
+    <li><a href="/tags/Linux下的C语言/">Linux下的C语言</a><small>1</small></li>
+  
+    <li><a href="/tags/Spring/">Spring</a><small>1</small></li>
+  
+    <li><a href="/tags/二进制加法/">二进制加法</a><small>1</small></li>
+  
+    <li><a href="/tags/快速排序/">快速排序</a><small>1</small></li>
+  
+    <li><a href="/tags/文章地址/">文章地址</a><small>1</small></li>
+  
+    <li><a href="/tags/设计模式/">设计模式</a><small>2</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Linux下的C语言/" style="font-size: 10px;">Linux下的C语言</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/二进制加法/" style="font-size: 10px;">二进制加法</a> <a href="/tags/快速排序/" style="font-size: 10px;">快速排序</a> <a href="/tags/文章地址/" style="font-size: 10px;">文章地址</a> <a href="/tags/设计模式/" style="font-size: 20px;">设计模式</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  <p>
+  
+  &copy; 2018 ZhouLuQi
+  
+  All rights reserved.</p>
+  <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</div>
+<div class="clearfix"></div>
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script></footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+<div id='bg'></div>
+</body>
+</html>

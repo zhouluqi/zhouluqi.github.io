@@ -1,0 +1,797 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>跳蛙笔记</title>
+  <meta name="author" content="ZhouLuQi" />
+
+  
+  <meta name="description" content="这是程序猿成长的必经之路" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  
+  <meta property="og:site_name" content="跳蛙笔记" />
+
+  
+  
+
+  
+    <meta property="og:image" content="" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="跳蛙笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">跳蛙笔记</a></h1>
+  <h2><a href="/">每次的记录都会是一次成长</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper">
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-07-24T12:15:17.000Z"><a href="/2018/07/24/手写springIOC/">2018-07-24</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2018/07/24/手写springIOC/">手写springIOC</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>##Spring的IOC和DI</p>
+<h6 id="原文章地址-https-blog-csdn-net-jiangyu1013-article-details-72654373"><a href="#原文章地址-https-blog-csdn-net-jiangyu1013-article-details-72654373" class="headerlink" title="原文章地址:https://blog.csdn.net/jiangyu1013/article/details/72654373"></a>原文章地址:<a href="https://blog.csdn.net/jiangyu1013/article/details/72654373" target="_blank" rel="noopener">https://blog.csdn.net/jiangyu1013/article/details/72654373</a></h6><p>IOC（DI）：java程序中的每个业务逻辑至少需要两个或以上的对象来协作完成。通常，每个对象在使用他的合作对象时，自己均要使用像new object（） 这样的语法来完成合作对象的申请工作。你会发现：对象间的耦合度高了。</p>
+<p>而IOC的思想是：Spring容器来实现这些相互依赖对象的创建、协调工作。对象只需要关系业务逻辑本身就可以了。从这方面来说，对象如何得到他的协作对象的责任被反转了（IOC、DI）。</p>
+<p>这是我对Spring的IOC的体会。DI其实就是IOC的另外一种说法。DI是由Martin Fowler 在2004年初的一篇论文中首次提出的。他总结：控制的什么被反转了？就是：获得依赖对象的方式反转了。<br>如果对这一核心概念还不理解：这里引用一个叫Bromon的blog上找到的浅显易懂的答案：</p>
+<p>IoC与DI</p>
+<ol>
+<li>首先想说说IoC（Inversion of Control，控制倒转）。</li>
+</ol>
+<p>这是spring的核心，贯穿始终。所谓IoC，对于spring框架来说，就是由spring来负责控制对象的生命周期和对象间的关系。举个例子，我们是如何找女朋友的？常见的情况是，我们到处去看哪里有长得漂亮身材又好的mm，然后打听她们的兴趣爱好、qq号、电话号…，想办法认识她们，投其所好送其所好，然后嘿嘿…这个过程是复杂深奥的，我们必须自己设计和面对每个环节。</p>
+<p>传统的程序开发也是如此，在一个对象中，如果要使用另外的对象，就必须得到它（自己new一个，或者从JNDI中查询一个），使用完之后还要将对象销毁（比如Connection等），对象始终会和其他的接口或类藕合起来。</p>
+<p>​    2.那么IoC是如何做的呢？有点像通过婚介找女朋友，在我和女朋友之间引入了一个第三者：婚姻介绍所。婚介管理了很多男男女女的资料，我可以向婚介提出一个列表，告诉它我想找个什么样的女朋友，比如长得像李嘉欣，身材像林熙雷，技术像齐达内之类的，然后婚介就会按照我们的要求，提供一个mm，我们只需要去和她谈恋爱、结婚就行了。简单明了，如果婚介给我们的人选不符合要求，我们就会抛出异常。整个过程不再由我自己控制，而是有婚介这样一个类似容器的机构来控制。</p>
+<p>​     3.Spring所倡导的开发方式就是如此：所有的类都会在spring容器中登记，告诉spring你是个什么东西，你需要什么东西，然后spring会在系统运行到适当的时候，把你要的东西主动给你，同时也把你交给其他需要你的东西。所有的类的创建、销毁都由 spring来控制，也就是说控制对象生存周期的不再是引用它的对象，而是spring。对于某个具体的对象而言，以前是它控制其他对象，现在是所有对象都被spring控制，所以这叫<strong>控制反转</strong>。</p>
+<p>​      4.IoC的一个重点是在系统运行中，动态的向某个对象提供它所需要的其他对象。这一点是通过DI（Dependency Injection，依赖注入）来实现的。比如对象A需要操作<a href="http://lib.csdn.net/base/mysql" target="_blank" rel="noopener">数据库</a>，以前我们总是要在A中自己编写代码来获得一个Connection对象，有了 spring我们就只需要告诉spring，A中需要一个Connection，至于这个Connection怎么构造，何时构造，A不需要知道。在系统运行时，spring会在适当的时候制造一个Connection，然后像打针一样，注射到A当中，这样就完成了对各个对象之间关系的控制。A需要依赖 Connection才能正常运行，而这个Connection是由spring注入到A中的，<strong>依赖注入的名字就这么来的</strong>。</p>
+<p>那么DI是如何实现的呢？ <a href="http://lib.csdn.net/base/java" target="_blank" rel="noopener">Java </a>1.3之后一个重要特征是反射（reflection），它允许程序在运行的时候动态的生成对象、执行对象的方法、改变对象的属性，spring就是通过反射来实现注入的。</p>
+<p> <strong>下面来让大家了解一下Spring到底是怎么运行的。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;   </span><br><span class="line">        ApplicationContext context = new FileSystemXmlApplicationContext(   </span><br><span class="line">                &quot;applicationContext.xml&quot;);   </span><br><span class="line">        Animal animal = (Animal) context.getBean(&quot;animal&quot;);   </span><br><span class="line">        animal.say();   </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码你一定很熟悉吧，不过还是让我们分析一下它吧，首先是applicationContext.xml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=&quot;animal&quot; class=&quot;phz.springframework.test.Cat&quot;&gt;   </span><br><span class="line">        &lt;property name=&quot;name&quot; value=&quot;kitty&quot; /&gt;   </span><br><span class="line">    &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+<p>他有一个类phz.springframework.test.Cat</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Cat implements Animal &#123;   </span><br><span class="line">    private String name;   </span><br><span class="line">    public void say() &#123;   </span><br><span class="line">        System.out.println(&quot;I am &quot; + name + &quot;!&quot;);   </span><br><span class="line">    &#125;   </span><br><span class="line">    public void setName(String name) &#123;   </span><br><span class="line">        this.name = name;   </span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现了phz.springframework.test.Animal接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public interface Animal &#123;   </span><br><span class="line">    public void say();   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>很明显上面的代码输出I am kitty! </p>
+<p>那么到底Spring是如何做到的呢？<br>接下来就让我们自己写个Spring 来看看Spring 到底是怎么运行的吧！ </p>
+<p>首先，我们定义一个Bean类，这个类用来存放一个Bean拥有的属性\</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/* Bean Id */  </span><br><span class="line">    private String id;   </span><br><span class="line">    /* Bean Class */  </span><br><span class="line">    private String type;   </span><br><span class="line">    /* Bean Property */  </span><br><span class="line">    private Map&lt;String, Object&gt; properties = new HashMap&lt;String, Object&gt;();</span><br></pre></td></tr></table></figure>
+<p>一个Bean包括id,type,和Properties。 </p>
+<p>接下来Spring 就开始加载我们的配置文件了，将我们配置的信息保存在一个HashMap中，HashMap的key就是Bean 的 Id ，HasMap 的value是这个Bean，只有这样我们才能通过context.getBean(“animal”)这个方法获得Animal这个类。我们都知道Spirng可以注入基本类型，而且可以注入像List，Map这样的类型，接下来就让我们以Map为例看看Spring是怎么保存的吧 </p>
+<p>Map配置可以像下面的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=&quot;test&quot; class=&quot;Test&quot;&gt;   </span><br><span class="line">        &lt;property name=&quot;testMap&quot;&gt;   </span><br><span class="line">            &lt;map&gt;   </span><br><span class="line">                &lt;entry key=&quot;a&quot;&gt;   </span><br><span class="line">                    &lt;value&gt;1&lt;/value&gt;   </span><br><span class="line">                &lt;/entry&gt;   </span><br><span class="line">                &lt;entry key=&quot;b&quot;&gt;   </span><br><span class="line">                    &lt;value&gt;2&lt;/value&gt;   </span><br><span class="line">                &lt;/entry&gt;   </span><br><span class="line">            &lt;/map&gt;   </span><br><span class="line">        &lt;/property&gt;   </span><br><span class="line">    &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+<p>Spring是怎样保存上面的配置呢？，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">if (beanProperty.element(&quot;map&quot;) != null) &#123;   </span><br><span class="line">                    Map&lt;String, Object&gt; propertiesMap = new HashMap&lt;String, Object&gt;();   </span><br><span class="line">                    Element propertiesListMap = (Element) beanProperty   </span><br><span class="line">                            .elements().get(0);   </span><br><span class="line">                    Iterator&lt;?&gt; propertiesIterator = propertiesListMap   </span><br><span class="line">                            .elements().iterator();   </span><br><span class="line">                    while (propertiesIterator.hasNext()) &#123;   </span><br><span class="line">                        Element vet = (Element) propertiesIterator.next();   </span><br><span class="line">                        if (vet.getName().equals(&quot;entry&quot;)) &#123;   </span><br><span class="line">                            String key = vet.attributeValue(&quot;key&quot;);   </span><br><span class="line">                            Iterator&lt;?&gt; valuesIterator = vet.elements()   </span><br><span class="line">                                    .iterator();   </span><br><span class="line">                            while (valuesIterator.hasNext()) &#123;   </span><br><span class="line">                                Element value = (Element) valuesIterator.next();   </span><br><span class="line">                                if (value.getName().equals(&quot;value&quot;)) &#123;   </span><br><span class="line">                                    propertiesMap.put(key, value.getText());   </span><br><span class="line">                                &#125;   </span><br><span class="line">                                if (value.getName().equals(&quot;ref&quot;)) &#123;   </span><br><span class="line">                                    propertiesMap.put(key, new String[] &#123; value   </span><br><span class="line">                                            .attributeValue(&quot;bean&quot;) &#125;);   </span><br><span class="line">                                &#125;   </span><br><span class="line">                            &#125;   </span><br><span class="line">                        &#125;   </span><br><span class="line">                    &#125;   </span><br><span class="line">                    bean.getProperties().put(name, propertiesMap);   </span><br><span class="line">                &#125;</span><br></pre></td></tr></table></figure>
+<p>接下来就进入最核心部分了，让我们看看Spring 到底是怎么依赖注入的吧，其实依赖注入的思想也很简单，它是通过反射机制实现的，在实例化一个类时，它通过反射调用类中set方法将事先保存在HashMap中的类属性注入到类中。让我们看看具体它是怎么做的吧。 </p>
+<p>首先实例化一个类，像这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public static Object newInstance(String className) &#123;   </span><br><span class="line">        Class&lt;?&gt; cls = null;   </span><br><span class="line">        Object obj = null;   </span><br><span class="line">        try &#123;   </span><br><span class="line">            cls = Class.forName(className);   </span><br><span class="line">            obj = cls.newInstance();   </span><br><span class="line">        &#125; catch (ClassNotFoundException e) &#123;   </span><br><span class="line">            throw new RuntimeException(e);   </span><br><span class="line">        &#125; catch (InstantiationException e) &#123;   </span><br><span class="line">            throw new RuntimeException(e);   </span><br><span class="line">        &#125; catch (IllegalAccessException e) &#123;   </span><br><span class="line">            throw new RuntimeException(e);   </span><br><span class="line">        &#125;   </span><br><span class="line">        return obj;   </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>最后它将这个类的实例返回给我们，我们就可以用了。我们还是以Map为例看看它是怎么做的，我写的代码里面是创建一个HashMap并把该HashMap注入到需要注入的类中，像这样，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">if (value instanceof Map) &#123;   </span><br><span class="line">                Iterator&lt;?&gt; entryIterator = ((Map&lt;?, ?&gt;) value).entrySet()   </span><br><span class="line">                        .iterator();   </span><br><span class="line">                Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();   </span><br><span class="line">                while (entryIterator.hasNext()) &#123;   </span><br><span class="line">                    Entry&lt;?, ?&gt; entryMap = (Entry&lt;?, ?&gt;) entryIterator.next();   </span><br><span class="line">                    if (entryMap.getValue() instanceof String[]) &#123;   </span><br><span class="line">                        map.put((String) entryMap.getKey(),   </span><br><span class="line">                                getBean(((String[]) entryMap.getValue())[0]));   </span><br><span class="line">                    &#125;   </span><br><span class="line">                &#125;   </span><br><span class="line">                BeanProcesser.setProperty(obj, property, map);   </span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+<p>好了，这样我们就可以用Spring 给我们创建的类了，当然Spring能做到的远不止这些，这个示例程序仅仅提供了Spring最核心的依赖注入功能中的一部分。 </p>
+<p>本文仅作为知识了解。。。</p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/Java/">Java</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Spring/">Spring</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-06-09T09:56:13.000Z"><a href="/2018/06/09/设计模式之策略模式/">2018-06-09</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2018/06/09/设计模式之策略模式/">设计模式之策略模式</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="设计模式之策略模式"><a href="#设计模式之策略模式" class="headerlink" title="设计模式之策略模式"></a>设计模式之策略模式</h3><p>​        之前的建造者模式是从别人的博客上摘抄的，这篇是想学习设计模式自己买了本HeadFirst设计模式,自己总结下还是对学习有帮助的。</p>
+<h3 id="先从模拟鸭子游戏开始-书中的例子"><a href="#先从模拟鸭子游戏开始-书中的例子" class="headerlink" title="先从模拟鸭子游戏开始(书中的例子)"></a>先从模拟鸭子游戏开始(书中的例子)</h3><h3 id="情景概述"><a href="#情景概述" class="headerlink" title="情景概述"></a>情景概述</h3><p>​        一个程序猿做了一个模拟鸭子的游戏，在游戏中会出现各种各样的鸭子，鸭子会一遍游泳一遍呱呱叫。代码编写的也就是设计一个鸭子的超类(父类)，各种各样的鸭子继承这个父类。</p>
+<p>###类和方法说明</p>
+<img src="/2018/06/09/设计模式之策略模式/1.png" title="这是一个新的博客的图片的说明">
+<p>​       Duck父类中的quack()方法和swim()方法是已经实现的方法，因为所有的鸭子要会呱呱叫和游泳，子类继承直接可以使用(代码复用)。display()方法是抽象的，因为每种鸭子的外观都是不一样的，让子类自己实现去展示自己的外观。因为父类中有抽象方法，所以Duck类是抽象类。</p>
+<p>​       其他的子类负责实现display()行为展示自己的外观。</p>
+<p>###提出创新</p>
+<p>​       这时候主管决定为了将其他游戏竞争者抛在脑后，添加会飞的鸭子。程序猿说没问题，这个简单，于是程序猿回去直接在父类中添加了一个方法fly()。</p>
+<img src="/2018/06/09/设计模式之策略模式/2.png" title="这是一个新的博客的图片的说明">
+<p>###产生问题</p>
+<p>​       自从加上这个方法后一些“橡皮鸭子”在屏幕上飞来飞去，原来程序猿忽略了一件事就是并非所有子类鸭子都会飞。这里涉及到<strong>对代码所做的局部修改不仅仅只影响到局部</strong>。在父类中加上的方法导致子类都具备fly功能，连那些不具备fly功能的子类也都获得此功能。</p>
+<p>###解决办法</p>
+<p>​      程序猿想到像quack()方法一样，鸭子可以直接用父类的方法嘎嘎叫，也可以重写父类中的quack()方法让鸭子吱吱叫。像这样在不应该具有fly功能的子类鸭子类中重写fly()方法，让他不实现飞的功能问题不就解决了吗？但是如果子类加入饵鸭(木头假鸭不会叫也不会飞)，岂不是都需要将两个方法覆盖掉？</p>
+<img src="/2018/06/09/设计模式之策略模式/3.png" title="这是一个新的博客的图片的说明">
+<p>###继承产生的问题</p>
+<p>利用继承来提供Duck的行为，会产生以下缺点：</p>
+<ul>
+<li>代码在多个子类中重复 <strong>不需要fly功能的子类需要重写去什么也不做</strong>。</li>
+<li>运行时的行为不容易改变 </li>
+<li>很难知道所有鸭子的全部行为</li>
+<li>改变会牵一发动全身，造成其他鸭子不想要的改变</li>
+</ul>
+<p>###接口解决</p>
+<p>​        程序猿得知主管要每六个月更新游戏，用继承是不行了，因为每当新的鸭子出现都要去检查是否需要覆盖fly()和quack()方法。所以他决定让一些类型的鸭子可以自由选择可飞可叫的功能，于是将fly()从父类提取出来放进一个Flyable的接口里，让会飞的鸭子实现此接口就OK了，quack()方法同样道理。</p>
+<img src="/2018/06/09/设计模式之策略模式/4.png" title="这是一个新的博客的图片的说明">
+<p>看似问题解决了，其实这是一个很蠢的想法，我们知道，并非所有的子类都具有飞行和呱呱叫的行为，所以继承不适合，虽然Flyable和Quackable可以解决一部分问题，但是无法达到代码复用，甚至在会飞的鸭子中飞的动作会有不同。接下来该如何解决呢？</p>
+<p>###设计原则</p>
+<p><strong>找出应用中可能需要变化之处，把他们独立出来，不要和那些不需要变化的代码混在一起</strong></p>
+<p>​      重新分析下问题，我们使用继承不能解决，因为有些行为鸭子子类在不断变化，而且让所有的子类都有这些行为是不合理的。Flyable和Quackable接口似乎还不错，解决了只有会飞的鸭子才实现Flyable，但是接口不具有实现代码，必须实现接口的鸭子类老老实实把方法实现，所以实现接口无法达到代码的复用。这就意味着：无论何时你需要修改某个行为，你必须将实现此行为的鸭子类逐个修改。</p>
+<p>   最终我们的目的是将每次新的需求会对有所改动的代码抽取出来，和其他稳定的代码分开来。并且经常更改的代码最好实现复用，只更改一次那是最好的了。</p>
+<p>###重新解决</p>
+<p>现在我们知道Duck类内的fly()和quack()会随着鸭子种类的不同而改变，所以我们将这来个行为提取出来建立新的类来代表每一个行为。</p>
+<img src="/2018/06/09/设计模式之策略模式/5.png" title="这是一个新的博客的图片的说明">
+<p>###设计鸭子的行为</p>
+<p>飞行和叫行为已经提取出来了，如何设计这俩个类呢？如何设计有弹性的程序呢？假如我们还想可以指定鸭子的行为呢？例如想产生一个绿头鸭实例并且指定特定的“类型”的飞行行为给它。让鸭子的行为可以动态的改变，换句话说，在鸭子类中包含设定行为的方法，就可以动态的改变绿头鸭的飞行行为。</p>
+<p>###设计原则</p>
+<p><strong>针对接口编程，不针对实现编程</strong></p>
+<p>现在我们利用接口代表每个行为，假如FlyBehavior与QuackBehavior,而行为的实现都可以将实现其中的一个接口。每个接口可以有很多的实现类来表达一种行为的不同类型(飞行为，怎么飞即多种飞法)。</p>
+<p>所以鸭子类不去负责实现这些行为接口，而是由鸭子的行为类去实现。这样做不同于以前，以前的做法是：行为来自父类的具体实现，或者继承某个接口自行实现，这俩种做法都依赖于“实现“,我们被邦邦的很死，不好更改行为。</p>
+<p>在新的设计中鸭子的子类将使用行为接口(FlyBehavior与QuackBehavior)所表示的行为，所以实际的“实现“不会被绑在鸭子的子类当中，具体的行为的方法实现都在那些实现了FlyBehavior与QuackBehavior接口的行为类中。</p>
+<img src="/2018/06/09/设计模式之策略模式/6.png" title="这是一个新的博客的图片的说明">
+<p>###什么是针对接口编程</p>
+<p>“针对接口编程”真正的意思是“针对超类型编程(supertype)”。所谓的接口有多个含义，接口是一个“概念”，也是Java的interface的构造。你可以在不涉及Java interface下“针对接口编程”，关键就在于多态。利用多态，程序可以针对超类型编程，执行时会根据实际情况执行到真正的行为，不会被绑死在超类型的行为上。“针对超类型编程”这句话可以明确的说成“变量的声明类型应该是超类型，通常是一个抽象类或者是一个接口，如此只要是具体实现此超类型的类所产生的对象，都可以指定给这个变量。这就意味着，声明类时不用理会以后执行时的真正对象类型!” </p>
+<h3 id="实现鸭子的行为"><a href="#实现鸭子的行为" class="headerlink" title="实现鸭子的行为"></a>实现鸭子的行为</h3><img src="/2018/06/09/设计模式之策略模式/7.png" title="这是一个新的博客的图片的说明">
+<p>这样的设计，可以让飞行和呱呱叫的动作被其他的对象复用，因为这些行为已经与鸭子类无关了，并且我们新增的一些行为不会影响到既有的行为类，也不会影响“使用”到飞行行为的鸭子类。<strong>这么一来有了继承的复用好处却没有了继承所带来的包袱</strong></p>
+<h3 id="整合鸭子的行为"><a href="#整合鸭子的行为" class="headerlink" title="整合鸭子的行为"></a>整合鸭子的行为</h3><p>首先在Duck加入两个实例变量，分别为“flyBehavior”和”quackBehavior”,都是接口类型，我们去除了Duck类中飞行和叫的行为(方法)，让这俩个变量来处理，每个鸭子对象可以动态设置变量以在运行时引用正确的行为类型。</p>
+<img src="/2018/06/09/设计模式之策略模式/8.png" title="这是一个新的博客的图片的说明">
+<p>先看鸭子父类代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class Duck&#123;</span><br><span class="line">  QuackBehavior quackBehavior; //每只鸭子都会引用实现QuackBehavior接口的对象</span><br><span class="line">  FlyBehavior flyBehavior;</span><br><span class="line">  //其他的变量</span><br><span class="line">  public void performQuack()&#123;</span><br><span class="line">    quackBehavior.quack();  //鸭子不亲自处理叫的行为，而是委托给quackBehavior引用对象。</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再来看一个子类鸭子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class MallardDuck extends Duck&#123;</span><br><span class="line">  public MallardDUck()&#123;</span><br><span class="line">    quackBehavior = new Quack();//接口回调，绿头鸭使用Quack类处理呱呱叫，所以当performQuack()被调用                                 // 时，叫的职责被委托给Quack对象，而我们得到了真正的呱呱叫。</span><br><span class="line">    flyBehavior = new FlyWithWings();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>记住因为绿头鸭继承了Duck类所以具有quackBehavior和 flyBehavior变量</strong></p>
+<p>通过上面的代码我们可以知道当MallardDuck实例化，它的构造器会把继承来的quackBehavior实例变量初始化成Quack类型的新实例，飞行方法也是同样。</p>
+<p>到了这里就差不多了，我们稍微改造就可大功告成。我们可以添加方法，让初始化实例变量做的更有弹性。就是构造函数这段代码。因为   quackBehavior的实例变量是有一个接口类型。所以我们要在运行时，通过多态的魔力动态的给它指定不同的QuickBehavior实现类。你是不是已经有想法了呢？</p>
+<h4 id="最终代码"><a href="#最终代码" class="headerlink" title="最终代码"></a>最终代码</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public class Duck&#123;</span><br><span class="line">  QuackBehavior quackBehavior; </span><br><span class="line">  FlyBehavior flyBehavior;</span><br><span class="line">   //其他的变量</span><br><span class="line">  public Duck()&#123;&#125;</span><br><span class="line">  public void performFly()&#123;</span><br><span class="line">    flyBehavior.fly();         //委托给行为类</span><br><span class="line">  &#125;</span><br><span class="line">  public void performQuack()&#123;</span><br><span class="line">    quackBehavior.quack();      //委托给行为类</span><br><span class="line">  &#125;</span><br><span class="line">  public abstract void display();</span><br><span class="line">  public void swim()&#123;</span><br><span class="line">    System.out.println(&quot;所有的鸭子都会游泳，继承父类就可得到这个功能&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  //在父类添加俩个方法，因为我们建立了一堆动态的鸭子功能没有用到，所以我们通过在鸭子子类中通过“设定方</span><br><span class="line">  //法”来设定鸭子的行为，而不是在鸭子的构造器内进行设定。从此我们可以随时调用这俩个方法来改变鸭子的行为。</span><br><span class="line">  public void setFlyBehavior(FlyBehavior fb)&#123;</span><br><span class="line">   flyBehavior = fb;         </span><br><span class="line">  &#125;</span><br><span class="line">   public void setQuackBehavior(QuackBehavior qb)&#123;</span><br><span class="line">   quackBehavior = qb;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>飞行行为接口和实现类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public interfa FlyBehavior&#123;</span><br><span class="line">public void fly();</span><br><span class="line">&#125;</span><br><span class="line">___________________________</span><br><span class="line">//飞行行为实现，给会飞的鸭子用</span><br><span class="line">public class FlyWithWings implements FlyBehavior&#123;</span><br><span class="line">  public void fly()&#123;</span><br><span class="line">    System.out.println(&quot;我可以飞了！&quot;);  </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">————————————————————————————</span><br><span class="line">//飞行行为实现，给不会飞的鸭子用(橡皮鸭和诱饵鸭用)</span><br><span class="line">public class FlyNoWay implements FlyBehavior&#123;</span><br><span class="line">  public void fly()&#123;</span><br><span class="line">    System.out.println(&quot;我不会飞&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建一个新的模型鸭子，一开始是不会飞的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class ModelDuck extends Duck&#123;</span><br><span class="line">  public ModelDuck()&#123;</span><br><span class="line">    quackBehavior = new Quack();</span><br><span class="line">    flyBehavior = new FlyNoWay();//实例一个不会飞的行为实现类对象</span><br><span class="line">  &#125;</span><br><span class="line">  public void display()&#123;</span><br><span class="line">    System.out.println(&quot;我是一个模型鸭子&quot;);//实现父类抽象方法</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建一个新的飞行行为，火箭动力飞行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public class FlyRocketPowered implements FlyBehavior&#123;</span><br><span class="line">  public void fly()&#123;</span><br><span class="line">     System.out.println(&quot;我利用火箭飞行&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Test&#123;</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line"> Duck model = new ModelDuck();</span><br><span class="line"> model.performFly();//第一次调用会被委托给 flyBehavior对象，但是实现对象是FlyNoWay()类型，构造器中设                     //设置的  (flyBehavior = new FlyNoWay();实例一个不会飞的行为实现类对象)</span><br><span class="line"> model.setFlyBehavior(new FlyRocketPowered());//调用继承来的setter方法，把火箭飞行的行为设定到模型鸭                                               //子当中,鸭子就具有了火箭飞行的行为。</span><br><span class="line"> model.performFly();//可以有火箭飞行的行为了</span><br><span class="line"> </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">我不会飞</span><br><span class="line">我利用火箭飞行</span><br></pre></td></tr></table></figure>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><img src="/2018/06/09/设计模式之策略模式/9.png" title="这是一个新的博客的图片的说明">
+<p>这个模式就是策略模式。多用组合少用继承，会有很多的方法达到继承实现复用的效果。</p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/Java/">Java</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/设计模式/">设计模式</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-06-05T09:57:59.000Z"><a href="/2018/06/05/设计模式之建造者模式/">2018-06-05</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2018/06/05/设计模式之建造者模式/">设计模式之建造者模式</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="设计模式之建造者模式"><a href="#设计模式之建造者模式" class="headerlink" title="设计模式之建造者模式"></a>设计模式之建造者模式</h2><p>java的设计模式大体上可以分为三大类:创建型模式、结构型模式、行为型模式。而建造者模式就属于创建型模式。</p>
+<p>通过阅读其他解释比较详细的博客，我理解总结为建造者模式是解决当一个类中有多个属性，new对象时初始化问题。举个例子，假如有个User类，有属性name、age、sex、tel、address，并且每个属性都可以为null,当我们实例化的时候可以初始化1个属性，需要5个构造方法，初始化2个属性需要10个构造方法。。。当然我们是不可能写这么多的构造方法的，那应该怎么办呢？哎！建造者模式出来了。下面上代码大家体会一下:</p>
+<figure class="highlight plain"><figcaption><span>class Builder &#123;    static class Student&#123;        String name </span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">public class Builder &#123;</span><br><span class="line"></span><br><span class="line">    static class User&#123;</span><br><span class="line">        String name = null ;</span><br><span class="line">        int age = 0 ;</span><br><span class="line">        String sex = null ;</span><br><span class="line">        String tel = null ;</span><br><span class="line">        String address = null ;</span><br><span class="line"></span><br><span class="line">　　　　　//构建器，利用构建器作为参数来构建Student对象</span><br><span class="line">        static class UserBuilder&#123;</span><br><span class="line">             String name = null ;</span><br><span class="line">             int age = 0 ;</span><br><span class="line">             String sex = null ;</span><br><span class="line">             String tel = null ;</span><br><span class="line">             String address = null ;</span><br><span class="line">            public UsertBuilder setName(String name) &#123;</span><br><span class="line">                this.name = name;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public StudentBuilder setAge(int age) &#123;</span><br><span class="line">                this.age = age;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public StudentBuilder setSex(String sex) &#123;</span><br><span class="line">                this.sex = sex;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public StudentBuilder setTel(String tel) &#123;</span><br><span class="line">                this.tel = tel;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            public StudentBuilder setAddress(String address) &#123;</span><br><span class="line">                this.address = address;</span><br><span class="line">                return  this ;</span><br><span class="line">            &#125;</span><br><span class="line">            public User build() &#123;</span><br><span class="line">                return new User(this);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public User(UserBuilder builder)&#123;</span><br><span class="line">            this.age = builder.age;</span><br><span class="line">            this.name = builder.name;</span><br><span class="line">            this.sex = builder.sex;</span><br><span class="line">            this.tel = builder.tel ;</span><br><span class="line">            this.address = builder.address ;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main( String[] args )&#123;</span><br><span class="line">        User a = new User.UserBuilder().setAge(15).setName(&quot;张三&quot;).build();</span><br><span class="line">        User b = new User.UserBuilder().setAddress(&quot;吉林长春&quot;).setSex(&quot;男&quot;).setName(&quot;张杰&quot;).build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/Java/">Java</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/设计模式/">设计模式</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-04-11T11:03:21.000Z"><a href="/2018/04/11/学习文章地址/">2018-04-11</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2018/04/11/学习文章地址/">学习文章地址</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="本篇只是记录一些我觉得写的好的博客地址以供学习参考"><a href="#本篇只是记录一些我觉得写的好的博客地址以供学习参考" class="headerlink" title="本篇只是记录一些我觉得写的好的博客地址以供学习参考"></a>本篇只是记录一些我觉得写的好的博客地址以供学习参考</h2><h4 id="实例讲解mysql入门基本操作语句-https-blog-csdn-net-dongfei2033-article-details-77983040-locationNum-7-amp-fps-1"><a href="#实例讲解mysql入门基本操作语句-https-blog-csdn-net-dongfei2033-article-details-77983040-locationNum-7-amp-fps-1" class="headerlink" title="实例讲解mysql入门基本操作语句:https://blog.csdn.net/dongfei2033/article/details/77983040?locationNum=7&amp;fps=1"></a>实例讲解mysql入门基本操作语句:<a href="https://blog.csdn.net/dongfei2033/article/details/77983040?locationNum=7&amp;fps=1" target="_blank" rel="noopener">https://blog.csdn.net/dongfei2033/article/details/77983040?locationNum=7&amp;fps=1</a></h4><h4 id="Java对象深浅拷贝原理-https-blog-csdn-net-u014727260-article-details-55003402"><a href="#Java对象深浅拷贝原理-https-blog-csdn-net-u014727260-article-details-55003402" class="headerlink" title="Java对象深浅拷贝原理:https://blog.csdn.net/u014727260/article/details/55003402"></a>Java对象深浅拷贝原理:<a href="https://blog.csdn.net/u014727260/article/details/55003402" target="_blank" rel="noopener">https://blog.csdn.net/u014727260/article/details/55003402</a></h4><h4 id="MySql数据库锁详解-好-https-blog-csdn-net-mysteryhaohao-article-details-51669741"><a href="#MySql数据库锁详解-好-https-blog-csdn-net-mysteryhaohao-article-details-51669741" class="headerlink" title="MySql数据库锁详解(好): https://blog.csdn.net/mysteryhaohao/article/details/51669741"></a>MySql数据库锁详解(好): <a href="https://blog.csdn.net/mysteryhaohao/article/details/51669741" target="_blank" rel="noopener">https://blog.csdn.net/mysteryhaohao/article/details/51669741</a></h4><h4 id="MySql数据库锁详解：https-www-cnblogs-com-luyucheng-p-6297752-html"><a href="#MySql数据库锁详解：https-www-cnblogs-com-luyucheng-p-6297752-html" class="headerlink" title="MySql数据库锁详解：https://www.cnblogs.com/luyucheng/p/6297752.html"></a>MySql数据库锁详解：<a href="https://www.cnblogs.com/luyucheng/p/6297752.html" target="_blank" rel="noopener">https://www.cnblogs.com/luyucheng/p/6297752.html</a></h4><h4 id="MySql数据库锁详解：https-blog-csdn-net-liyanlei5858-article-details-79087955"><a href="#MySql数据库锁详解：https-blog-csdn-net-liyanlei5858-article-details-79087955" class="headerlink" title="MySql数据库锁详解：https://blog.csdn.net/liyanlei5858/article/details/79087955"></a>MySql数据库锁详解：<a href="https://blog.csdn.net/liyanlei5858/article/details/79087955" target="_blank" rel="noopener">https://blog.csdn.net/liyanlei5858/article/details/79087955</a></h4><h4 id="MySql数据库事物-https-blog-csdn-net-mevicky-article-details-50332443"><a href="#MySql数据库事物-https-blog-csdn-net-mevicky-article-details-50332443" class="headerlink" title="MySql数据库事物:https://blog.csdn.net/mevicky/article/details/50332443"></a>MySql数据库事物:<a href="https://blog.csdn.net/mevicky/article/details/50332443" target="_blank" rel="noopener">https://blog.csdn.net/mevicky/article/details/50332443</a></h4><h4 id="Java中关键字volatile详解-https-blog-csdn-net-yanshuanche3765-article-details-78405872"><a href="#Java中关键字volatile详解-https-blog-csdn-net-yanshuanche3765-article-details-78405872" class="headerlink" title="Java中关键字volatile详解:https://blog.csdn.net/yanshuanche3765/article/details/78405872"></a>Java中关键字volatile详解:<a href="https://blog.csdn.net/yanshuanche3765/article/details/78405872" target="_blank" rel="noopener">https://blog.csdn.net/yanshuanche3765/article/details/78405872</a></h4><h4 id="Java中关键字volatile详解-https-www-cnblogs-com-dolphin0520-p-3920373-html"><a href="#Java中关键字volatile详解-https-www-cnblogs-com-dolphin0520-p-3920373-html" class="headerlink" title="Java中关键字volatile详解:https://www.cnblogs.com/dolphin0520/p/3920373.html"></a>Java中关键字volatile详解:<a href="https://www.cnblogs.com/dolphin0520/p/3920373.html" target="_blank" rel="noopener">https://www.cnblogs.com/dolphin0520/p/3920373.html</a></h4><h4 id="字符串常量池：https-blog-csdn-net-Xlyxcar-article-details-78704768"><a href="#字符串常量池：https-blog-csdn-net-Xlyxcar-article-details-78704768" class="headerlink" title="字符串常量池：https://blog.csdn.net/Xlyxcar/article/details/78704768"></a>字符串常量池：<a href="https://blog.csdn.net/Xlyxcar/article/details/78704768" target="_blank" rel="noopener">https://blog.csdn.net/Xlyxcar/article/details/78704768</a></h4><h4 id="字符串常量池：https-www-cnblogs-com-paddix-p-5326863-html"><a href="#字符串常量池：https-www-cnblogs-com-paddix-p-5326863-html" class="headerlink" title="字符串常量池：https://www.cnblogs.com/paddix/p/5326863.html"></a>字符串常量池：<a href="https://www.cnblogs.com/paddix/p/5326863.html" target="_blank" rel="noopener">https://www.cnblogs.com/paddix/p/5326863.html</a></h4><h4 id="排序：https-www-cnblogs-com-chengxiao-p-6129630-html"><a href="#排序：https-www-cnblogs-com-chengxiao-p-6129630-html" class="headerlink" title="排序：https://www.cnblogs.com/chengxiao/p/6129630.html"></a>排序：<a href="https://www.cnblogs.com/chengxiao/p/6129630.html" target="_blank" rel="noopener">https://www.cnblogs.com/chengxiao/p/6129630.html</a></h4><h4 id="Spring-IOC-http-www-360doc-com-content-17-0917-07-2708086-687778967-shtml"><a href="#Spring-IOC-http-www-360doc-com-content-17-0917-07-2708086-687778967-shtml" class="headerlink" title="Spring IOC:http://www.360doc.com/content/17/0917/07/2708086_687778967.shtml"></a>Spring IOC:<a href="http://www.360doc.com/content/17/0917/07/2708086_687778967.shtml" target="_blank" rel="noopener">http://www.360doc.com/content/17/0917/07/2708086_687778967.shtml</a></h4>
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/其他/">其他</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/文章地址/">文章地址</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-04-09T12:27:55.000Z"><a href="/2018/04/09/不用加减乘除做加法/">2018-04-09</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2018/04/09/不用加减乘除做加法/">不用加减乘除做加法</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="不用加减乘除实现加法"><a href="#不用加减乘除实现加法" class="headerlink" title="不用加减乘除实现加法"></a>不用加减乘除实现加法</h3><h6 id="来源博客"><a href="#来源博客" class="headerlink" title="来源博客"></a><em>来源博客</em></h6><p>面试的时候被问到这个问题，很多人在想：四则运算都不能用，那还能用什么啊？可是问题总是要解决的，我们只能打开思路去思考各种可能性。首先我们可以分析人们是如何做十进制的加法的，比如是如何得出5+17=22这个结果的。实际上，我们可以分成三步进行：第一步只做各位相加不进位，此时相加的结果是12（个位数5和7相加不要进位是2，十位数0和1相加结果是1）；第二步做进位，5+7中有进位，进位的值是10;第三步把前面两个结果加起来，12+10的结果是22，刚好5+17=22。<br>我们一直在想，求两数之和四则运算都不能用，那还能用什么？对数字做运算，除了四则运算之外，也就只剩下位运算了。位运算是针对二进制的，我们就以二进制再来分析一下前面的三步走策略对二进制是不是也适用。<br>5的二进制是101，17的二进制是10001。还是试着把计算分成三步：第一步各位相加但不计进位，得到的结果是10100（最后一位两个数都是1，相加的结果是二进制的10。这一步不计进位，因此结果仍然是0）；第二步记下进位。在这个例子中只在最后一位相加时产生一个进位，结果是二进制的10;第三步把前两步的结果相加，得到的结果是10110，转换成十进制正好是22。由此可见三步走的策略对二进制也是适用的。<br>接下来我们试着把二进制的加法用位运算来替代。第一步不考虑进位对每一位相加。0加0、1加1的结果都0，0加1、1加0的结果都是1。我们注意到，这和异或的结果是一样的。对异或而言，0和0、1和1异或的结果是0，而0和1、l和0的异或结果是1。接着考虑第二步进位，对0加0、0加1、1加0而言，都不会产生进位，只有1加1时，会向前产生一个进位。此时我们可以想象成是两个数先做位与运算，然后再向左移动一位。只有两个数都是1的时候，位与得到的结果是1，其余都是0。第三步把前两个步骤的结果相加。第三步相加的过程依然是重复前面两步，直到不产生进位为止。<br>把这个过程想清楚之后，写出的代码非常简洁。下面是一段基于循环实现的参考代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class Problem47 &#123;</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">     Problem47 p=new Problem47();</span><br><span class="line">      System.out.println(p.add(8, 16));</span><br><span class="line">  &#125;</span><br><span class="line">    public int add(int num1,int num2)&#123;</span><br><span class="line">        int sum,carray;</span><br><span class="line">    do&#123;</span><br><span class="line">       sum=num1^num2;</span><br><span class="line">       carray=(num1&amp;num2)&lt;&lt;1;</span><br><span class="line">       num1=sum;</span><br><span class="line">       num2=carray;</span><br><span class="line">      &#125;while(num2!=0);</span><br><span class="line">      return num1;</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/算法/">算法</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/二进制加法/">二进制加法</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-04-06T02:57:23.000Z"><a href="/2018/04/06/快速排序笔记/">2018-04-06</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2018/04/06/快速排序笔记/">快速排序笔记</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h1 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h1><p>来自 <a href="https://mp.weixin.qq.com/s?__biz=MzIwNTc4NTEwOQ==&amp;mid=2247484978&amp;idx=2&amp;sn=64ffb41c0cc224097903ca3d87730ca9&amp;chksm=972ad748a05d5e5e438481b66a99abd00f2cc312024e9d6b965ce4d9b14a72eea1c1aea73636&amp;scene=27&amp;key=b8dec7eff4635d98ccdf20bac3efddbdf57e9b06747560a7e02eff13a36ccf46ea8b17f9ee03e0d79e73694a54748b4d8ddba81a068c25d0bda192959011e5d148fd8ef3c797e4b25a3cdac8acd057c1&amp;ascene=7&amp;uin=MTQzODA4ODc3Mg%3D%3D&amp;devicetype=Windows+10&amp;version=62060038&amp;lang=zh_CN&amp;pass_ticket=AjcHLCa9A38bFTnytps1cOT4WrSymq%2BjQSIKp20SX8f7Q0bugMwtaiXbOymtfTCX&amp;winzoom=1##" target="_blank" rel="noopener">码农有道</a></p>
+<p>​       快速排序，顾名思义，是一种排序速度非常快的排序方法，该算法之所以非常快，是因为高度优化的内部循环，该算法在实际应用中非常广泛。</p>
+<p>##排序思想</p>
+<p>快速排序是一种采用分治思想，在实践中通常运行较快一种排序算法，它的思路如下:</p>
+<p>对于一个无序数组（排序前先将数组随机打乱）</p>
+<img src="/2018/04/06/快速排序笔记/1.png" title="这是一个新的博客的图片的说明">
+<p>首先，任意选取一个元素（这里选择数组第一个元素），该元素称为中轴元素</p>
+<img src="/2018/04/06/快速排序笔记/2.png" title="这是一个新的博客的图片的说明">
+<p>然后将大于或者等于中轴元素的元素放在右边，小于或者等于中轴元素的元素放在左边</p>
+<p>上面两个过程（选元素和调整位置）称为分割（partition）</p>
+<img src="/2018/04/06/快速排序笔记/3.jpg" title="这是一个新的博客的图片的说明">
+<p>然后对左右两个子数组分别按照同样的方法进行分割操作（递归进行）</p>
+<p>一直递归分割到子数组只有一个或零个元素为止，此时整个数组有序</p>
+<img src="/2018/04/06/快速排序笔记/4.jpg" title="这是一个新的博客的图片的说明">
+<p>​                                                                     子数组是相对而言的</p>
+<h4 id="分割接下来说是怎么进行的"><a href="#分割接下来说是怎么进行的" class="headerlink" title="分割接下来说是怎么进行的"></a>分割接下来说是怎么进行的</h4><p>首先，用两个变量 i 和 j 从数组两边开始向中间扫描，i 向右走，j 往左走</p>
+<img src="/2018/04/06/快速排序笔记/5.png" title="这是一个新的博客的图片的说明">
+<p><strong>i 初始化为第一个元素的下标，j 初始化为最后一个元素的下标加 1</strong></p>
+<p>i 往右走，直到遇见比中轴元素大的（或等于）元素停止移动，j 向左走，直到遇到比中轴元素小的（或等于）的元素停止移动</p>
+<img src="/2018/04/06/快速排序笔记/6.jpg" title="这是一个新的博客的图片的说明">
+<p>此时，如果 i &lt; j 则交换 i、j 所指向的元素</p>
+
+<p><strong>上图或等于是因为 i 指向的元素或 j 指向的元素可能与中轴元素相等</strong></p>
+<p>然后继续向右向左走，直到 i &gt;= j 整个扫描停止!</p>
+<img src="/2018/04/06/快速排序笔记/8.png" title="这是一个新的博客的图片的说明">
+<p>此时 i 对应元素的左边（不包含arr[i]）必定小于或等于5,j 对应元素的右边（不包含arr[j]）必定大于或等于5</p>
+<p>交换中轴元素 5 与 arr[j]</p>
+<img src="/2018/04/06/快速排序笔记/9.png" title="这是一个新的博客的图片的说明">
+<p><strong>分割完成</strong></p>
+<h4 id="排序代码"><a href="#排序代码" class="headerlink" title="排序代码"></a>排序代码</h4><p>对数组arr[low…high]进行快速排序，首先进行分割操作，返回中轴元素下标 j，然后对左数组arr[low…j-1] 和 右数组arr[j+1…high]分别递归进行排序，什么时候递归终止？当然是数组大小为小于等于1（0或1）时</p>
+<img src="/2018/04/06/快速排序笔记/10.jpg" title="这是一个新的博客的图片的说明">
+<img src="/2018/04/06/快速排序笔记/11.jpg" title="这是一个新的博客的图片的说明">
+<p>i == high 和 j == low 这两个条件防止i、j 越界</p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/算法/">算法</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/快速排序/">快速排序</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2018-01-08T08:47:20.000Z"><a href="/2018/01/08/Linux下C的按任意键执行方法/">2018-01-08</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2018/01/08/Linux下C的按任意键执行方法/">Linux下C的按任意键执行方法</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="在Linux下C语言的按任意键执行方法"><a href="#在Linux下C语言的按任意键执行方法" class="headerlink" title="在Linux下C语言的按任意键执行方法"></a>在Linux下C语言的按任意键执行方法</h2><p> 期末的课程设计日子又到了，这次我们课程设计是完成嵌入式系统开发-智能家居。第一节课老师没讲什么，要求我们在虚拟机Ubuntu下写一个小游戏来预热下。游戏很简单，我们重点来看按任意键执行的方法。</p>
+<img src="/2018/01/08/Linux下C的按任意键执行方法/asd.png" title="这是一个新的博客的图片的说明">
+<p>在提示信息后按任意键就可以打印随机产生的50个字母，那这个方法如何来完成呢？大家可能会说一个getchar就搞定了。我们还是来仔细的学习一下。</p>
+<h3 id="getchar-和getch"><a href="#getchar-和getch" class="headerlink" title="getchar()和getch()"></a>getchar()和getch()</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">getchar():</span><br><span class="line">该函数声明在stdio.h头文件中，使用的时候要包含stdio.h头文件。如：</span><br><span class="line">　　#include&lt;stdio.h&gt;</span><br><span class="line">　　int getchar(void);</span><br><span class="line">getch与getchar基本功能相同,差别是getch直接从键盘获取键值,不等待用户按回车,只要用户按一个键,getch就立刻返回, getch返回值是用户输入的ASCII码,出错返回-1.输入的字符不会回显在屏幕上.getch函数常用于程序调试中,在调试时,在关键位置显示有关的结果以待查看,然后用getch函数暂停程序运行,当按任意键后程序继续运行.</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">getch()：</span><br><span class="line">　　所在头文件：conio.h</span><br><span class="line">　　函数用途：从控制台读取一个字符，但不显示在屏幕上</span><br><span class="line">例如：</span><br><span class="line">　　char ch;或int ch；</span><br><span class="line">　　getch();或ch=getch();</span><br><span class="line">　　用getch();会等待你按下任意键，再继续执行下面的语句；</span><br><span class="line">　　用ch=getch();会等待你按下任意键之后，把该键字符所对应的ASCII码赋给ch,再执行下面的语句。</span><br></pre></td></tr></table></figure>
+<p>看到游戏的题目当然是用getch()符合我们的要求了，但是我们是在linux的gcc下编译er’er’er，而getch()是在conio.h头文件，但是conio.h这个文件不是c语言的标准库文件，所以在linux的gcc下是没有这个头文件的。所以我们也不能用getch()方法。那我们该如何实现呢？</p>
+<h3 id="getchar-配合stty"><a href="#getchar-配合stty" class="headerlink" title="getchar()配合stty"></a>getchar()配合stty</h3><p>我们知道getchar()输入一个字符后还需要输入一个回车才能继续执行，并且还把输入的字符打印出来，我们可以配合linux stty命令达到想要的效果。</p>
+<ul>
+<li><p>stty -icanon 设置一次性读完操作，如使用getchar()读操作，不需要按enter</p>
+</li>
+<li><p>stty -echo 设置命令不被显示</p>
+<p>通过以上俩条指令我们就可以达到想要的效果。 system(“stty -echo”);</p>
+<pre><code>system(&quot;stty -echo&quot;);
+system(&quot;stty -icanon&quot;);
+getchar();
+//继续执行的代码
+</code></pre></li>
+</ul>
+<h3 id="getch-方法"><a href="#getch-方法" class="headerlink" title="getch()方法"></a>getch()方法</h3><p>我们老师给的一个getch()方法，同样可以达到效果。</p>
+<pre><code>char getch( ) {
+    struct termios oldt, newt;
+    char ch;
+    tcgetattr( STDIN_FILENO, &amp;oldt );
+    newt = oldt;
+    newt.c_lflag &amp;= ~( ICANON | ECHO );
+    tcsetattr( STDIN_FILENO, TCSANOW, &amp;newt );
+    ch = getchar();
+    tcsetattr( STDIN_FILENO, TCSANOW, &amp;oldt );
+    return ch;
+}
+</code></pre><p>以上就是在linux 用gcc 编译C代码实现按任意键执行的俩个方法。</p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/编程语言/">编程语言</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Linux下的C语言/">Linux下的C语言</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2017-12-13T10:01:12.000Z"><a href="/2017/12/13/Git的认知笔记/">2017-12-13</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2017/12/13/Git的认知笔记/">Git的认知笔记</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="Git简介"><a href="#Git简介" class="headerlink" title="Git简介"></a>Git简介</h2><p>​        作为连一个程序圈的渣渣都算不上，当然要从头学起了，最近要写一个网站使用Git和伙伴们一起写程序，对于一片空白的地方当要是要汗水浇灌了，写笔记是一个很好的习惯呦！开始干活。。。</p>
+<p>​        Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目。并且被称为是目前世界上最先进的分布式版本控制系统。Git 是 Linus Torvalds 为了帮助管理 Linux 内核开发而开发的一个开放源码的版本控制软件。Git 与常用的版本控制工具 CVS, Subversion 等不同，它采用了分布式版本库的方式，不必服务器端软件支持。可能通过上述也不能很好的使大家了解Git，接下来我们继续学习Git。</p>
+<p>可能大家会和我一样从来未接触版本控制，那我们先来学习一下版本控制系统。</p>
+<p>​         版本控制系统是一种记录一个或若干文件内容变化，以便将来查阅特定版本修订情况的系统。版本控制系统不仅可以应用于软件源代码的文本文件，而且可以对任何类型的文件进行版本控制。对于公司开发项目会有很多的开发人员，为了让多人一起开发提高效率，各自分工，协同开发，因此集中化的版本控制系统应运而生（CVCS）。这类系统都有一个单一的集中管理的服务器，保存所有文件的修订版本。而协同工作的人们都通过客户端连接到这台服务器，获取最新的文件或者提交更新。集中化的版本控制系统，最显而易见的缺点是中央服务器的单点故障问题。如果宕机，那么就会出现谁都无法提交更新的情况，那么也就无法协同工作；如果磁盘发生故障，而备份又不够即时，那么就有丢失数据的风险，最坏的情况是丢失整个项目的历史更改记录。因此，分布式版本控制系统问世了（DVCS）。</p>
+<p>在分布式版本控制系统中，客户端不仅仅是只提取最新版本的文件快照，而是把代码仓库完整的镜像下来。所以每一次提取的操作，都是对代码仓库的完整备份，因此也就不必担心协同工作用的服务器发生故障。</p>
+<p>Git和其他版本控制系统的主要差别在于：Git只关心文件数据的整体是否发生了变化，而多数的其他系统则只关心文件内容的具体差异，它们在每个版本中记录着各个文件的具体差异。在Git中的绝大多数操作都只需要访问本地文件和资源，不需要联网。这是因为Git在本地磁盘上就保留着所有当前项目的历史更新，所以处理起来速度飞快，这是使用空间换时间的处理方式。使用Git，即使在没有网络或VPN的情况下，你同样可以非常愉快的频繁提交更新，等到有了网络的时候再提交到远程的仓库。</p>
+<p>Git管理中文件的三种状态</p>
+<ul>
+<li>对于任何一个文件，在Git内部都只有三种状态：已修改，已暂存和已提交。</li>
+</ul>
+<ul>
+<li><p>已修改 表示修改了某个文件，但还没有提交保存；</p>
+</li>
+<li><p>已暂存 表示把已修改的文件放在下次提交时要保存的清单中了；</p>
+</li>
+<li><p>已提交 表示该文件已经被安全的保存在本地数据库中了。</p>
+<p>Git在管理项目时，文件流转的三个工作区域是：本地仓库(即工作目录，也就是项目的源文件)-&gt;暂存区域-&gt;Git的工作目录。因此，基本的Git工作流程是：  在本地的工作目录修改某些文件；然后对修改后的文件进行快照，保存到暂存区域；最后提交更新，将保存在暂存区域中的文件快照永久转存到Git的工作目录中。</p>
+<p>版本控制系统还有很多，例如VSS、SVN等，他们的特点大家自行学习吧。</p>
+</li>
+</ul>
+<h2 id="Git与SVN的区别"><a href="#Git与SVN的区别" class="headerlink" title="Git与SVN的区别"></a>Git与SVN的区别</h2><p>Git 与 SVN 区别点：</p>
+<ul>
+<li><p>1、GIT是分布式的，SVN不是：这是GIT和其它非分布式的版本控制系统，例如SVN，CVS等，最核心的区别。</p>
+</li>
+<li><p>2、GIT把内容按元数据方式存储，而SVN是按文件：所有的资源控制系统都是把文件的元信息隐藏在一个类似.svn,.cvs等的文件夹里。</p>
+</li>
+<li><p>3、GIT分支和SVN的分支不同：分支在SVN中一点不特别，就是版本库中的另外的一个目录。</p>
+</li>
+<li><p>4、GIT没有一个全局的版本号，而SVN有：目前为止这是跟SVN相比GIT缺少的最大的一个特征。</p>
+</li>
+<li><p>5、GIT的内容完整性要优于SVN：GIT的内容存储使用的是SHA-1哈希算法。这能确保代码内容的完整性，确保在遇到磁盘故障和网络问题时降低对版本库的破坏。</p>
+</li>
+<li><p>6、Git可以离线工作，不影响本地代码编写，等有网络连接以后可以再上传代码，并且在本地可以根据不同的需要，本地新建自己的分支。</p>
+</li>
+<li><p>7、每一个个体都可以作为服务器。每一次Clone就是从服务器上pull到了所有的内容，包括版本信息。</p>
+<h2 id="Git的安装"><a href="#Git的安装" class="headerlink" title="Git的安装"></a>Git的安装</h2><p>我只学了window的安装及配置，其他平台都是大同小异了，要使用Git，第一步当然是安装Git了。直接上链接。</p>
+<p>1、打开<a href="http://git-scm.com/download/win" target="_blank" rel="noopener">http://git-scm.com/download/win</a>直接下载</p>
+<p>2、下载Gtihub for Windows 地址为：<a href="http://windows.github.com" target="_blank" rel="noopener">http://windows.github.com</a></p>
+<p>安装完之后在开始菜单中找到GitBush，也可以鼠标右键桌面空白。</p>
+<img src="/2017/12/13/Git的认知笔记/2.png" title="这是一个新的博客的图片的说明">
+<p>点击GitBush会弹出类似命令行窗口的东西，在命令行输入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global user.name &quot;Your Name&quot;</span><br><span class="line">$ git config --global user.email &quot;email@example.com&quot;</span><br></pre></td></tr></table></figure>
+<p>因为Git是分布式版本控制系统，所以，每个机器都独立拥有唯一标识：你的名字和Email地址。</p>
+<h2 id="创建版本库"><a href="#创建版本库" class="headerlink" title="创建版本库"></a>创建版本库</h2><p>​    什么是版本库呢？版本库又名仓库，英文名<strong>repository</strong>，你可以简单理解成一个目录，这个目录里面的所有文件都可以被Git管理起来，每个文件的修改、删除，Git都能跟踪，以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。</p>
+<p>所以，创建一个版本库非常简单，首先，选择一个合适的地方，创建一个空目录，我建在了F盘的github中。<strong>为了不节外生枝，目录中不要出现中文。</strong></p>
+<p>还有一个是当我们想要进入到某个目录中，先打开这个目录，然后按住shift+右键 打开GitBush ，窗口就是当前目录。</p>
+<img src="/2017/12/13/Git的认知笔记/1.png" title="这是一个新的博客的图片的说明">
+<p>然后通过<code>git init</code>命令把这个目录变成Git可以管理的仓库：</p>
+<img src="/2017/12/13/Git的认知笔记/3.png" title="这是一个新的博客的图片的说明">
+<p>这样Git就把仓库建好了，而且告诉你是一个空的仓库（empty Git repository），我们回头看目录下多了一个<code>.git</code>的目录，这个目录是Git来跟踪管理版本库的，我们不要动。更改可能毁坏我们的仓库。我们就可以将项目放在这个仓库下来管理了。</p>
+<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><p>​      Git是分布式版本控制系统，同一个Git仓库，可以分布到不同的机器上。一台电脑上有一个最原始的版本库，充当服务器的角色，其他的电脑分别“克隆”这个版本库到自己的电脑上，而且每台机器的版本库其实都是一样的，并没有主次之分。各自把各自的提交推送到服务器仓库里，也从服务器仓库中拉取别人的提交。我们可以自己搭建一台24小时运行Git的服务器，不过开始学Git不用搭建服务器我们可以使用GitHub网站，这个网站就是提供Git仓库托管服务的，所以，只要注册一个GitHub账号，就可以免费获得Git远程仓库。</p>
+<p>​      由于本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以我们要设置SSH密钥，属于本地仓库到远程仓库的通行证。</p>
+<p>第1步：创建SSH Key。在用户主目录下，看看有没有.ssh目录，如果有，再看看这个目录下有没有<code>id_rsa</code>和<code>id_rsa.pub</code>这两个文件，如果已经有了，可直接跳到下一步。如果没有，打开Shell（Windows下打开Git Bash），创建SSH Key：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C &quot;youremail@example.com&quot;</span><br></pre></td></tr></table></figure>
+<p>之后可以在用户主目录里找到<code>.ssh</code>目录，里面有<code>id_rsa</code>和<code>id_rsa.pub</code>两个文件，这两个就是SSH Key的秘钥对，<code>id_rsa</code>是私钥，不能泄露出去，<code>id_rsa.pub</code>是公钥，可以放心地告诉任何人。之后在GitHub上添加SSH Key就可以往远程仓库传东西了。 </p>
+<p>当然好有好多东西要学习，以及一些命令。今天就到这里了。</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/软件使用/">软件使用</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Git/">Git</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+
+<nav id="pagination">
+  
+</nav>
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:yoursite.com">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Java/">Java</a><small>3</small></li>
+  
+    <li><a href="/categories/其他/">其他</a><small>1</small></li>
+  
+    <li><a href="/categories/算法/">算法</a><small>2</small></li>
+  
+    <li><a href="/categories/编程语言/">编程语言</a><small>1</small></li>
+  
+    <li><a href="/categories/软件使用/">软件使用</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最新文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2018/07/24/手写springIOC/">手写springIOC</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/09/设计模式之策略模式/">设计模式之策略模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/05/设计模式之建造者模式/">设计模式之建造者模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/11/学习文章地址/">学习文章地址</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/09/不用加减乘除做加法/">不用加减乘除做加法</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/Git/">Git</a><small>1</small></li>
+  
+    <li><a href="/tags/Linux下的C语言/">Linux下的C语言</a><small>1</small></li>
+  
+    <li><a href="/tags/Spring/">Spring</a><small>1</small></li>
+  
+    <li><a href="/tags/二进制加法/">二进制加法</a><small>1</small></li>
+  
+    <li><a href="/tags/快速排序/">快速排序</a><small>1</small></li>
+  
+    <li><a href="/tags/文章地址/">文章地址</a><small>1</small></li>
+  
+    <li><a href="/tags/设计模式/">设计模式</a><small>2</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Linux下的C语言/" style="font-size: 10px;">Linux下的C语言</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/二进制加法/" style="font-size: 10px;">二进制加法</a> <a href="/tags/快速排序/" style="font-size: 10px;">快速排序</a> <a href="/tags/文章地址/" style="font-size: 10px;">文章地址</a> <a href="/tags/设计模式/" style="font-size: 20px;">设计模式</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  <p>
+  
+  &copy; 2018 ZhouLuQi
+  
+  All rights reserved.</p>
+  <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</div>
+<div class="clearfix"></div>
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script></footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+<div id='bg'></div>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>Git的认知笔记 | 跳蛙笔记</title>
+  <meta name="author" content="ZhouLuQi" />
+
+  
+  <meta name="description" content="这是程序猿成长的必经之路" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="Git的认知笔记" />
+  <meta property="og:site_name" content="跳蛙笔记" />
+
+  
+  
+
+  
+    <meta property="og:image" content="" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="跳蛙笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">跳蛙笔记</a></h1>
+  <h2><a href="/">每次的记录都会是一次成长</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2017-12-13T10:01:12.000Z"><a href="/2017/12/13/Git的认知笔记/">2017-12-13</a></time>
+      
+      
+  
+    <h1 class="title">Git的认知笔记</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="Git简介"><a href="#Git简介" class="headerlink" title="Git简介"></a>Git简介</h2><p>​        作为连一个程序圈的渣渣都算不上，当然要从头学起了，最近要写一个网站使用Git和伙伴们一起写程序，对于一片空白的地方当要是要汗水浇灌了，写笔记是一个很好的习惯呦！开始干活。。。</p>
+<p>​        Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目。并且被称为是目前世界上最先进的分布式版本控制系统。Git 是 Linus Torvalds 为了帮助管理 Linux 内核开发而开发的一个开放源码的版本控制软件。Git 与常用的版本控制工具 CVS, Subversion 等不同，它采用了分布式版本库的方式，不必服务器端软件支持。可能通过上述也不能很好的使大家了解Git，接下来我们继续学习Git。</p>
+<p>可能大家会和我一样从来未接触版本控制，那我们先来学习一下版本控制系统。</p>
+<p>​         版本控制系统是一种记录一个或若干文件内容变化，以便将来查阅特定版本修订情况的系统。版本控制系统不仅可以应用于软件源代码的文本文件，而且可以对任何类型的文件进行版本控制。对于公司开发项目会有很多的开发人员，为了让多人一起开发提高效率，各自分工，协同开发，因此集中化的版本控制系统应运而生（CVCS）。这类系统都有一个单一的集中管理的服务器，保存所有文件的修订版本。而协同工作的人们都通过客户端连接到这台服务器，获取最新的文件或者提交更新。集中化的版本控制系统，最显而易见的缺点是中央服务器的单点故障问题。如果宕机，那么就会出现谁都无法提交更新的情况，那么也就无法协同工作；如果磁盘发生故障，而备份又不够即时，那么就有丢失数据的风险，最坏的情况是丢失整个项目的历史更改记录。因此，分布式版本控制系统问世了（DVCS）。</p>
+<p>在分布式版本控制系统中，客户端不仅仅是只提取最新版本的文件快照，而是把代码仓库完整的镜像下来。所以每一次提取的操作，都是对代码仓库的完整备份，因此也就不必担心协同工作用的服务器发生故障。</p>
+<p>Git和其他版本控制系统的主要差别在于：Git只关心文件数据的整体是否发生了变化，而多数的其他系统则只关心文件内容的具体差异，它们在每个版本中记录着各个文件的具体差异。在Git中的绝大多数操作都只需要访问本地文件和资源，不需要联网。这是因为Git在本地磁盘上就保留着所有当前项目的历史更新，所以处理起来速度飞快，这是使用空间换时间的处理方式。使用Git，即使在没有网络或VPN的情况下，你同样可以非常愉快的频繁提交更新，等到有了网络的时候再提交到远程的仓库。</p>
+<p>Git管理中文件的三种状态</p>
+<ul>
+<li>对于任何一个文件，在Git内部都只有三种状态：已修改，已暂存和已提交。</li>
+</ul>
+<ul>
+<li><p>已修改 表示修改了某个文件，但还没有提交保存；</p>
+</li>
+<li><p>已暂存 表示把已修改的文件放在下次提交时要保存的清单中了；</p>
+</li>
+<li><p>已提交 表示该文件已经被安全的保存在本地数据库中了。</p>
+<p>Git在管理项目时，文件流转的三个工作区域是：本地仓库(即工作目录，也就是项目的源文件)-&gt;暂存区域-&gt;Git的工作目录。因此，基本的Git工作流程是：  在本地的工作目录修改某些文件；然后对修改后的文件进行快照，保存到暂存区域；最后提交更新，将保存在暂存区域中的文件快照永久转存到Git的工作目录中。</p>
+<p>版本控制系统还有很多，例如VSS、SVN等，他们的特点大家自行学习吧。</p>
+</li>
+</ul>
+<h2 id="Git与SVN的区别"><a href="#Git与SVN的区别" class="headerlink" title="Git与SVN的区别"></a>Git与SVN的区别</h2><p>Git 与 SVN 区别点：</p>
+<ul>
+<li><p>1、GIT是分布式的，SVN不是：这是GIT和其它非分布式的版本控制系统，例如SVN，CVS等，最核心的区别。</p>
+</li>
+<li><p>2、GIT把内容按元数据方式存储，而SVN是按文件：所有的资源控制系统都是把文件的元信息隐藏在一个类似.svn,.cvs等的文件夹里。</p>
+</li>
+<li><p>3、GIT分支和SVN的分支不同：分支在SVN中一点不特别，就是版本库中的另外的一个目录。</p>
+</li>
+<li><p>4、GIT没有一个全局的版本号，而SVN有：目前为止这是跟SVN相比GIT缺少的最大的一个特征。</p>
+</li>
+<li><p>5、GIT的内容完整性要优于SVN：GIT的内容存储使用的是SHA-1哈希算法。这能确保代码内容的完整性，确保在遇到磁盘故障和网络问题时降低对版本库的破坏。</p>
+</li>
+<li><p>6、Git可以离线工作，不影响本地代码编写，等有网络连接以后可以再上传代码，并且在本地可以根据不同的需要，本地新建自己的分支。</p>
+</li>
+<li><p>7、每一个个体都可以作为服务器。每一次Clone就是从服务器上pull到了所有的内容，包括版本信息。</p>
+<h2 id="Git的安装"><a href="#Git的安装" class="headerlink" title="Git的安装"></a>Git的安装</h2><p>我只学了window的安装及配置，其他平台都是大同小异了，要使用Git，第一步当然是安装Git了。直接上链接。</p>
+<p>1、打开<a href="http://git-scm.com/download/win" target="_blank" rel="noopener">http://git-scm.com/download/win</a>直接下载</p>
+<p>2、下载Gtihub for Windows 地址为：<a href="http://windows.github.com" target="_blank" rel="noopener">http://windows.github.com</a></p>
+<p>安装完之后在开始菜单中找到GitBush，也可以鼠标右键桌面空白。</p>
+<img src="/2017/12/13/Git的认知笔记/2.png" title="这是一个新的博客的图片的说明">
+<p>点击GitBush会弹出类似命令行窗口的东西，在命令行输入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global user.name &quot;Your Name&quot;</span><br><span class="line">$ git config --global user.email &quot;email@example.com&quot;</span><br></pre></td></tr></table></figure>
+<p>因为Git是分布式版本控制系统，所以，每个机器都独立拥有唯一标识：你的名字和Email地址。</p>
+<h2 id="创建版本库"><a href="#创建版本库" class="headerlink" title="创建版本库"></a>创建版本库</h2><p>​    什么是版本库呢？版本库又名仓库，英文名<strong>repository</strong>，你可以简单理解成一个目录，这个目录里面的所有文件都可以被Git管理起来，每个文件的修改、删除，Git都能跟踪，以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。</p>
+<p>所以，创建一个版本库非常简单，首先，选择一个合适的地方，创建一个空目录，我建在了F盘的github中。<strong>为了不节外生枝，目录中不要出现中文。</strong></p>
+<p>还有一个是当我们想要进入到某个目录中，先打开这个目录，然后按住shift+右键 打开GitBush ，窗口就是当前目录。</p>
+<img src="/2017/12/13/Git的认知笔记/1.png" title="这是一个新的博客的图片的说明">
+<p>然后通过<code>git init</code>命令把这个目录变成Git可以管理的仓库：</p>
+<img src="/2017/12/13/Git的认知笔记/3.png" title="这是一个新的博客的图片的说明">
+<p>这样Git就把仓库建好了，而且告诉你是一个空的仓库（empty Git repository），我们回头看目录下多了一个<code>.git</code>的目录，这个目录是Git来跟踪管理版本库的，我们不要动。更改可能毁坏我们的仓库。我们就可以将项目放在这个仓库下来管理了。</p>
+<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><p>​      Git是分布式版本控制系统，同一个Git仓库，可以分布到不同的机器上。一台电脑上有一个最原始的版本库，充当服务器的角色，其他的电脑分别“克隆”这个版本库到自己的电脑上，而且每台机器的版本库其实都是一样的，并没有主次之分。各自把各自的提交推送到服务器仓库里，也从服务器仓库中拉取别人的提交。我们可以自己搭建一台24小时运行Git的服务器，不过开始学Git不用搭建服务器我们可以使用GitHub网站，这个网站就是提供Git仓库托管服务的，所以，只要注册一个GitHub账号，就可以免费获得Git远程仓库。</p>
+<p>​      由于本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以我们要设置SSH密钥，属于本地仓库到远程仓库的通行证。</p>
+<p>第1步：创建SSH Key。在用户主目录下，看看有没有.ssh目录，如果有，再看看这个目录下有没有<code>id_rsa</code>和<code>id_rsa.pub</code>这两个文件，如果已经有了，可直接跳到下一步。如果没有，打开Shell（Windows下打开Git Bash），创建SSH Key：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C &quot;youremail@example.com&quot;</span><br></pre></td></tr></table></figure>
+<p>之后可以在用户主目录里找到<code>.ssh</code>目录，里面有<code>id_rsa</code>和<code>id_rsa.pub</code>两个文件，这两个就是SSH Key的秘钥对，<code>id_rsa</code>是私钥，不能泄露出去，<code>id_rsa.pub</code>是公钥，可以放心地告诉任何人。之后在GitHub上添加SSH Key就可以往远程仓库传东西了。 </p>
+<p>当然好有好多东西要学习，以及一些命令。今天就到这里了。</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+<p>​</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/软件使用/">软件使用</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Git/">Git</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:yoursite.com">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Java/">Java</a><small>3</small></li>
+  
+    <li><a href="/categories/其他/">其他</a><small>1</small></li>
+  
+    <li><a href="/categories/算法/">算法</a><small>2</small></li>
+  
+    <li><a href="/categories/编程语言/">编程语言</a><small>1</small></li>
+  
+    <li><a href="/categories/软件使用/">软件使用</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最新文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2018/07/24/手写springIOC/">手写springIOC</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/09/设计模式之策略模式/">设计模式之策略模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/06/05/设计模式之建造者模式/">设计模式之建造者模式</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/11/学习文章地址/">学习文章地址</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/09/不用加减乘除做加法/">不用加减乘除做加法</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/Git/">Git</a><small>1</small></li>
+  
+    <li><a href="/tags/Linux下的C语言/">Linux下的C语言</a><small>1</small></li>
+  
+    <li><a href="/tags/Spring/">Spring</a><small>1</small></li>
+  
+    <li><a href="/tags/二进制加法/">二进制加法</a><small>1</small></li>
+  
+    <li><a href="/tags/快速排序/">快速排序</a><small>1</small></li>
+  
+    <li><a href="/tags/文章地址/">文章地址</a><small>1</small></li>
+  
+    <li><a href="/tags/设计模式/">设计模式</a><small>2</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Linux下的C语言/" style="font-size: 10px;">Linux下的C语言</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/二进制加法/" style="font-size: 10px;">二进制加法</a> <a href="/tags/快速排序/" style="font-size: 10px;">快速排序</a> <a href="/tags/文章地址/" style="font-size: 10px;">文章地址</a> <a href="/tags/设计模式/" style="font-size: 20px;">设计模式</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  <p>
+  
+  &copy; 2018 ZhouLuQi
+  
+  All rights reserved.</p>
+  <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</div>
+<div class="clearfix"></div>
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script></footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+<div id='bg'></div>
+</body>
+</html>
